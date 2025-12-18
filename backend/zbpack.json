@@ -1,0 +1,4 @@
+{
+  "build_command": "./gradlew clean build -x test --no-daemon",
+  "output_dir": "build/libs"
+}
