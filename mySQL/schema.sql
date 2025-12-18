@@ -121,11 +121,11 @@ CREATE TABLE contact_messages (
 );
 
 INSERT INTO users (email, password, name, phone, role, created_at) VALUES
-('admin@choose.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '管理員', '0912345678', 'ADMIN', NOW()),
-('user1@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '張三', '0923456789', 'MEMBER', DATE_SUB(NOW(), INTERVAL 30 DAY)),
-('user2@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '李四', '0934567890', 'MEMBER', DATE_SUB(NOW(), INTERVAL 20 DAY)),
-('user3@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '王五', '0945678901', 'MEMBER', DATE_SUB(NOW(), INTERVAL 10 DAY)),
-('user4@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '趙六', '0956789012', 'MEMBER', DATE_SUB(NOW(), INTERVAL 5 DAY));
+('admin@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '管理員', '0912345678', 'ADMIN', NOW()),
+('user1@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '張三', '0923456789', 'MEMBER', DATE_SUB(NOW(), INTERVAL 30 DAY)),
+('user2@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '李四', '0934567890', 'MEMBER', DATE_SUB(NOW(), INTERVAL 20 DAY)),
+('user3@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '王五', '0945678901', 'MEMBER', DATE_SUB(NOW(), INTERVAL 10 DAY)),
+('user4@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '趙六', '0956789012', 'MEMBER', DATE_SUB(NOW(), INTERVAL 5 DAY));
 
 INSERT INTO categories (name, description, created_at) VALUES
 ('上衣', '各式上衣商品，包含T恤、襯衫、針織衫等', DATE_SUB(NOW(), INTERVAL 60 DAY)),
