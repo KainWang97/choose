@@ -1,6 +1,9 @@
 plugins {
     id 'java'
+    
     id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+
     // id 'org.gretty' version '4.1.10'
 }
 
@@ -25,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    
     implementation platform("org.springframework.boot:spring-boot-dependencies:4.0.0")
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
