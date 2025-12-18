@@ -41,10 +41,10 @@ public class AuthController {
     private ResponseCookie createAuthCookie(String token) {
         return ResponseCookie.from(AUTH_COOKIE_NAME, token)
                 .httpOnly(true)
-                .secure(false) // 開發環境設為 false，生產環境應設為 true
+                .secure(true) // HTTPS 必須為 true
                 .path("/")
                 .maxAge(jwtExpiration / 1000) // 轉換為秒
-                .sameSite("Strict")
+                .sameSite("None") // 跨域請求需要 None
                 .build();
     }
 
@@ -54,10 +54,10 @@ public class AuthController {
     private ResponseCookie createClearCookie() {
         return ResponseCookie.from(AUTH_COOKIE_NAME, "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Strict")
+                .sameSite("None")
                 .build();
     }
 
