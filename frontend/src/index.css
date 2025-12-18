@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* Tailwind v4 自訂主題 - 使用 CSS 變數 */
+@theme {
+  /* 自訂字型 */
+  --font-serif: "Noto Serif JP", serif;
+  --font-sans: "Inter", sans-serif;
+
+  /* 自訂顏色 - Tailwind v4 格式 */
+  --color-sumi: #1c1c1c;
+  --color-paper: #f5f5f4;
+  --color-washi: #fafaf9;
+  --color-linen: #e7e5e4;
+}
+
+/* 基礎樣式 */
+body {
+  background-color: var(--color-washi);
+  color: var(--color-sumi);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.serif {
+  font-family: var(--font-serif);
+}
+
+/* 隱藏捲軸 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
