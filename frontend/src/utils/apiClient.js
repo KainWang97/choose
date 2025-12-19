@@ -1,7 +1,7 @@
 /**
  * API Client Utility
  * 使用 axios 處理統一的 API 請求、錯誤處理
- * JWT token 透過 HttpOnly Cookie 自動傳送
+ * JWT token 透過 Bearer Token 和 Cookie 雙重機制
  */
 import axios from "axios";
 
@@ -9,14 +9,36 @@ import axios from "axios";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/chooseMVP/api";
 
+// Token 儲存 key
+const TOKEN_KEY = "auth_token";
+
+// Token 管理函數
+export const tokenManager = {
+  getToken: () => localStorage.getItem(TOKEN_KEY),
+  setToken: (token) => localStorage.setItem(TOKEN_KEY, token),
+  removeToken: () => localStorage.removeItem(TOKEN_KEY),
+};
+
 // 建立 axios instance
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Cookie 自動附帶
+  withCredentials: true, // Cookie 自動附帶（作為 fallback）
 });
+
+// Request 攔截器 - 加入 Authorization header
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = tokenManager.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // Response 攔截器 - 處理錯誤和解析 ApiResponse
 apiClient.interceptors.response.use(
@@ -38,6 +60,7 @@ apiClient.interceptors.response.use(
 
       // 401 Unauthorized - token 過期或無效
       if (status === 401) {
+        tokenManager.removeToken();
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("auth:logout"));
         }

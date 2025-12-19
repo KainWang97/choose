@@ -661,6 +661,8 @@ export const inquiryApi = {
 // ============================================
 // Auth API
 // ============================================
+import { tokenManager } from "../utils/apiClient.js";
+
 export const authApi = {
   /**
    * 使用者登入
@@ -670,7 +672,10 @@ export const authApi = {
    */
   async login(data) {
     const backend = await apiPost("/auth/login", data);
-    // Token 透過 HttpOnly Cookie 自動設定
+    // 儲存 Token 到 localStorage
+    if (backend.token) {
+      tokenManager.setToken(backend.token);
+    }
     return transformUser(backend);
   },
 
@@ -682,7 +687,10 @@ export const authApi = {
    */
   async register(data) {
     const backend = await apiPost("/auth/register", data);
-    // Token 透過 HttpOnly Cookie 自動設定
+    // 儲存 Token 到 localStorage
+    if (backend.token) {
+      tokenManager.setToken(backend.token);
+    }
     return transformUser(backend);
   },
 
@@ -706,6 +714,8 @@ export const authApi = {
    * @returns {Promise<void>}
    */
   async logout() {
+    // 清除本地 Token
+    tokenManager.removeToken();
     // 後端會清除 HttpOnly Cookie
     await apiPost("/auth/logout");
   },

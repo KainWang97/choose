@@ -80,7 +80,7 @@ public class AuthController {
         log.info("Registration successful: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(ApiResponse.success("User registered successfully", new UserResponse(savedUser)));
+                .body(ApiResponse.success("User registered successfully", new UserResponse(savedUser, token)));
     }
 
     @PostMapping("/login")
@@ -110,7 +110,7 @@ public class AuthController {
                 user.getUserId(), user.getEmail(), user.getRole());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(ApiResponse.success("Login successful", new UserResponse(user)));
+                .body(ApiResponse.success("Login successful", new UserResponse(user, token)));
     }
 
     @GetMapping("/me")
@@ -162,7 +162,7 @@ public class AuthController {
         private String password;
     }
 
-    // Response DTO - token removed, now sent via HttpOnly cookie
+    // Response DTO - 包含 token 供 Frontend 使用
     @Data
     static class UserResponse {
         private Long id;
@@ -170,6 +170,7 @@ public class AuthController {
         private String name;
         private String phone;
         private String role;
+        private String token; // 新增: 供 Frontend 儲存
 
         public UserResponse(User user) {
             this.id = user.getUserId();
@@ -177,6 +178,11 @@ public class AuthController {
             this.name = user.getName();
             this.phone = user.getPhone();
             this.role = user.getRole().name();
+        }
+        
+        public UserResponse(User user, String token) {
+            this(user);
+            this.token = token;
         }
     }
 }
