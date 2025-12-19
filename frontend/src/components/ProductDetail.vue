@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, onUnmounted } from "vue";
 import { getLargeImageUrl } from "../utils/imageHelper.js";
 
 const props = defineProps({
@@ -11,6 +11,8 @@ const emit = defineEmits(["add-to-cart"]);
 
 const addedAnimation = ref(false);
 const isImageLoaded = ref(false);
+const imageLoadError = ref(false);
+const imageLoadTimeout = ref(null);
 
 // 選中的規格
 const selectedVariant = ref(null);
@@ -49,12 +51,51 @@ const isSingleVariant = computed(
   () => (props.product.variants?.length || 0) <= 1
 );
 
+// 設定圖片載入超時（10秒後強制顯示）
+const startImageLoadTimeout = () => {
+  clearImageLoadTimeout();
+  imageLoadTimeout.value = setTimeout(() => {
+    if (!isImageLoaded.value) {
+      isImageLoaded.value = true; // 超時後強制顯示
+      console.warn("圖片載入超時，強制顯示");
+    }
+  }, 10000);
+};
+
+const clearImageLoadTimeout = () => {
+  if (imageLoadTimeout.value) {
+    clearTimeout(imageLoadTimeout.value);
+    imageLoadTimeout.value = null;
+  }
+};
+
+// 圖片載入成功
+const handleImageLoad = () => {
+  clearImageLoadTimeout();
+  isImageLoaded.value = true;
+  imageLoadError.value = false;
+};
+
+// 圖片載入失敗
+const handleImageError = () => {
+  clearImageLoadTimeout();
+  isImageLoaded.value = true; // 允許顯示錯誤狀態
+  imageLoadError.value = true;
+  console.error("圖片載入失敗:", props.product?.imageUrl);
+};
+
 // 初始化選擇第一個規格
 onMounted(() => {
   window.scrollTo(0, 0);
   if (props.product.variants?.length) {
     selectedVariant.value = props.product.variants[0];
   }
+  startImageLoadTimeout();
+});
+
+// 清理計時器
+onUnmounted(() => {
+  clearImageLoadTimeout();
 });
 
 // 監聽商品變化，重新選擇規格
@@ -62,6 +103,8 @@ watch(
   () => props.product,
   (newProduct) => {
     isImageLoaded.value = false; // 重置圖片載入狀態
+    imageLoadError.value = false;
+    startImageLoadTimeout(); // 重新開始超時計時
     if (newProduct.variants?.length) {
       selectedVariant.value = newProduct.variants[0];
     } else {
@@ -133,7 +176,8 @@ const handleAddToCart = () => {
           <img
             :src="getLargeImageUrl(product.imageUrl)"
             :alt="product.name"
-            @load="isImageLoaded = true"
+            @load="handleImageLoad"
+            @error="handleImageError"
             class="w-full h-full object-cover transition-opacity duration-500"
             :class="isImageLoaded ? 'opacity-100' : 'opacity-0'"
           />
