@@ -22,6 +22,10 @@ const goToReturnPolicy = () => {
 const goToPaymentGuide = () => {
   router.push("/payment-guide");
 };
+
+const goToPrivacy = () => {
+  router.push("/privacy");
+};
 </script>
 
 <template>
@@ -71,6 +75,12 @@ const goToPaymentGuide = () => {
             class="hover:text-washi transition-colors text-left"
           >
             退換貨說明
+          </button>
+          <button
+            @click="goToPrivacy"
+            class="hover:text-washi transition-colors text-left"
+          >
+            隱私權政策
           </button>
         </div>
       </div>

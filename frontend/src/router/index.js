@@ -64,6 +64,12 @@ const routes = [
     meta: { title: "匯款說明 - Choose" },
   },
   {
+    path: "/privacy",
+    name: "privacy",
+    component: () => import("../views/PrivacyPage.vue"),
+    meta: { title: "隱私權政策 - Choose" },
+  },
+  {
     path: "/admin",
     name: "admin",
     component: AdminView,

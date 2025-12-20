@@ -74,13 +74,13 @@ const confirmButtonClass = {
             <div class="flex justify-end gap-3">
               <button
                 @click="handleCancel"
-                class="px-6 py-2.5 border border-stone-300 text-stone-600 text-sm uppercase tracking-widest hover:bg-stone-50 transition-colors"
+                class="px-6 py-2.5 border-1 border-stone-300 text-stone-700 text-sm uppercase tracking-widest hover:bg-stone-100 hover:border-stone-300 transition-colors"
               >
                 {{ cancelText || "取消" }}
               </button>
               <button
                 @click="handleConfirm"
-                class="px-6 py-2.5 text-sm uppercase tracking-widest transition-colors"
+                class="px-6 py-2.5 border-1 border-stone-300 text-sm uppercase tracking-widest hover:bg-stone-200 hover:border-stone-600 transition-colors"
                 :class="confirmButtonClass[variant || 'info']"
               >
                 {{ confirmText || "確認" }}

@@ -226,7 +226,7 @@ const toggleMode = () => {
           <input
             type="text"
             v-model="email"
-            :placeholder="isLogin ? 'admin@komorebi.com' : '請輸入 Email'"
+            :placeholder="isLogin ? '' : '請輸入 Email'"
             class="w-full bg-stone-50 border p-3 text-sm focus:outline-none rounded-none transition-colors"
             :class="
               fieldErrors.email
@@ -248,7 +248,7 @@ const toggleMode = () => {
           <input
             type="password"
             v-model="password"
-            :placeholder="isLogin ? '請輸入密碼' : '設定密碼 (至少 6 字元)'"
+            :placeholder="isLogin ? '密碼至少6字元' : '設定密碼 (至少 6 字元)'"
             class="w-full bg-stone-50 border p-3 text-sm focus:outline-none rounded-none transition-colors"
             :class="
               fieldErrors.password

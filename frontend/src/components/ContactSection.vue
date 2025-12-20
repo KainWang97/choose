@@ -49,6 +49,16 @@ const handleSubmit = () => {
     <div class="max-w-4xl mx-auto px-6 text-center">
       <h2 className="text-3xl font-serif text-sumi mb-12">Inquiries</h2>
 
+      <!-- 備註說明 -->
+      <div
+        class="max-w-lg mx-auto mb-8 p-4 bg-stone-50 border border-stone-200 rounded"
+      >
+        <p class="text-sm text-stone-600 text-center leading-relaxed">
+          感謝您的詢問！管理員將會儘快透過 <strong>Email</strong> 回覆您的訊息，
+          請確保您填寫的電子郵件地址正確。
+        </p>
+      </div>
+
       <form
         @submit.prevent="handleSubmit"
         class="max-w-lg mx-auto space-y-6 text-left"
@@ -109,9 +119,12 @@ const handleSubmit = () => {
       <transition name="fade">
         <div
           v-if="showToast"
-          class="fixed top-6 left-1/2 -translate-x-1/2 z-[120] bg-stone-700/80 text-washi px-5 py-3 shadow-lg rounded"
+          class="fixed top-6 left-1/2 -translate-x-1/2 z-[120] bg-stone-100 border border-stone-300 text-stone-700 px-6 py-4 shadow-md rounded max-w-sm text-center"
         >
-          訊息已送出
+          <p class="font-medium">訊息已成功送出</p>
+          <p class="text-sm mt-1 text-stone-500">
+            管理員將會儘快透過 Email 回覆您
+          </p>
         </div>
       </transition>
     </div>

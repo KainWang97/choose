@@ -59,6 +59,28 @@ const featuredProductIds = computed(() => {
   return computedFeaturedIds.value;
 });
 
+// 新品勾選 Loading 狀態
+const featuredLoading = ref(new Set());
+
+// 切換新品狀態（帶 Loading）
+const toggleFeaturedWithLoading = async (productId) => {
+  // 設定 Loading 狀態
+  featuredLoading.value.add(productId);
+  featuredLoading.value = new Set(featuredLoading.value); // 觸發響應式
+
+  try {
+    // 發送事件給父組件處理
+    emit("toggle-featured", productId);
+
+    // 等待一小段時間讓 API 完成
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  } finally {
+    // 移除 Loading 狀態
+    featuredLoading.value.delete(productId);
+    featuredLoading.value = new Set(featuredLoading.value);
+  }
+};
+
 const activeTab = ref(props.initialTab ?? "INVENTORY");
 
 watch(
@@ -739,22 +761,30 @@ const monthlySales = computed(() => {
                   </td>
                   <td class="py-4 text-center">
                     <button
-                      @click="emit('toggle-featured', product.id)"
+                      @click="toggleFeaturedWithLoading(product.id)"
                       :disabled="
-                        !product.isFeatured && featuredProductIds.length >= 5
+                        featuredLoading.has(product.id) ||
+                        (!product.isFeatured && featuredProductIds.length >= 5)
                       "
                       class="p-1.5 rounded transition-all hover:scale-110 hover:bg-amber-50 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                       :title="
-                        product.isFeatured
+                        featuredLoading.has(product.id)
+                          ? '載入中...'
+                          : product.isFeatured
                           ? '從新品移除'
                           : featuredProductIds.length >= 5
                           ? '已達上限 5 個'
                           : '設為新品'
                       "
                     >
+                      <!-- Loading 圈圈 -->
+                      <span
+                        v-if="featuredLoading.has(product.id)"
+                        class="inline-block w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"
+                      ></span>
                       <!-- 已選取：打勾方框 + 發光效果 -->
                       <svg
-                        v-if="product.isFeatured"
+                        v-else-if="product.isFeatured"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                         fill="currentColor"

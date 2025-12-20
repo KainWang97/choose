@@ -204,7 +204,14 @@ const handleFinalSubmit = async () => {
           ← Back to Cart
         </button>
 
-        <h1 class="text-3xl font-serif text-sumi mb-12">Checkout</h1>
+        <h1 class="text-3xl font-serif text-sumi mb-4">Checkout</h1>
+
+        <!-- 測試網頁提示 -->
+        <div class="bg-amber-50 border border-amber-200 p-4 mb-8 rounded">
+          <p class="text-sm text-amber-800">
+            ⚠️ 此為測試網頁，僅供學習用途，不具備實際交易功能。
+          </p>
+        </div>
 
         <form
           v-if="step === 'INFO'"

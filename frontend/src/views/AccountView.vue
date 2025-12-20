@@ -6,8 +6,10 @@
 import { ref, inject, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { userApi } from "../services/api.js";
+import { useConfirm } from "../composables/useConfirm.js";
 
 const router = useRouter();
+const { confirm } = useConfirm();
 
 // 從 App.vue 注入資料和方法
 const user = inject("user");
@@ -78,6 +80,17 @@ const handleDeleteAccount = async () => {
     deleteError.value = "請輸入密碼";
     return;
   }
+
+  // 二次確認 Alert
+  const confirmed = await confirm({
+    title: "最後確認",
+    message: "您的帳號資料刪除後將無法復原，\n確定要永久刪除帳號嗎？",
+    confirmText: "確認刪除",
+    cancelText: "取消",
+    variant: "danger",
+  });
+
+  if (!confirmed) return;
 
   isDeletingAccount.value = true;
   try {
@@ -544,81 +557,77 @@ const handleChangePassword = async () => {
           </form>
         </div>
 
-        <!-- 刪除帳號 - 危險操作區 -->
-        <div class="space-y-4 mt-8 pt-8 border-t-2 border-red-200">
-          <h2
-            class="text-sm uppercase tracking-widest text-red-600 border-b border-red-100 pb-2"
-          >
-            危險操作
-          </h2>
-          <div class="bg-red-50 border border-red-200 p-4 rounded">
-            <p class="text-sm text-red-700 mb-4">
-              刪除帳號後，您的登入資訊將被移除，個人資料將進行去識別化處理。<br />
-              <strong>依《商業會計法》規定，訂單紀錄將保留 5 年。</strong>
-            </p>
-            <button
-              v-if="!showDeleteConfirm"
-              @click="showDeleteConfirm = true"
-              class="px-4 py-2 border border-red-300 text-red-600 text-xs uppercase tracking-widest hover:bg-red-100 transition-colors"
-            >
-              刪除帳號
-            </button>
-
-            <!-- 刪除確認表單 -->
-            <div
-              v-else
-              class="space-y-4 mt-4 p-4 bg-white border border-red-300 rounded"
-            >
-              <p class="text-sm text-red-800 font-medium">確認刪除帳號</p>
-              <div>
-                <label class="block text-xs text-stone-500 mb-1">
-                  請輸入密碼以驗證身份
-                </label>
-                <input
-                  type="password"
-                  v-model="deleteForm.password"
-                  placeholder="請輸入密碼"
-                  class="w-full bg-white border border-stone-300 p-2 text-sm focus:outline-none focus:border-red-400"
-                />
-              </div>
-              <div>
-                <label class="block text-xs text-stone-500 mb-1">
-                  請輸入
-                  <span class="font-mono font-bold text-red-600">DELETE</span>
-                  以確認
-                </label>
-                <input
-                  type="text"
-                  v-model="deleteForm.confirmText"
-                  placeholder="DELETE"
-                  class="w-full bg-white border border-stone-300 p-2 text-sm focus:outline-none focus:border-red-400 font-mono"
-                />
-              </div>
-              <p v-if="deleteError" class="text-sm text-red-600">
-                {{ deleteError }}
+        <!-- 刪除帳號區塊 -->
+        <div class="space-y-4 mt-8 pt-8 border-t border-stone-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <button
+                v-if="!showDeleteConfirm"
+                @click="showDeleteConfirm = true"
+                class="px-4 py-2 border border-red-300 text-red-600 text-xs uppercase tracking-widest hover:bg-red-50 transition-colors"
+              >
+                刪除會員帳號
+              </button>
+              <p class="text-xs text-stone-400 mt-2">
+                ∗ 如有未完成訂單（待付款、已付款、已出貨），則無法刪除帳號
               </p>
-              <div class="flex gap-2">
-                <button
-                  @click="cancelDeleteAccount"
-                  :disabled="isDeletingAccount"
-                  class="px-4 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50 disabled:opacity-50"
-                >
-                  取消
-                </button>
-                <button
-                  @click="handleDeleteAccount"
-                  :disabled="
-                    isDeletingAccount || deleteForm.confirmText !== 'DELETE'
-                  "
-                  class="px-4 py-2 bg-red-600 text-white text-xs uppercase tracking-widest hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  <span
-                    v-if="isDeletingAccount"
-                    class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
-                  ></span>
-                  {{ isDeletingAccount ? "刪除中..." : "確認刪除帳號" }}
-                </button>
-              </div>
+            </div>
+          </div>
+
+          <!-- 刪除確認表單 -->
+          <div
+            v-if="showDeleteConfirm"
+            class="space-y-4 p-4 bg-red-50 border border-red-200 rounded"
+          >
+            <p class="text-sm text-red-700 font-medium">確認刪除帳號</p>
+            <div>
+              <label class="block text-xs text-stone-600 mb-1">
+                請輸入密碼以驗證身分
+              </label>
+              <input
+                type="password"
+                v-model="deleteForm.password"
+                placeholder="請輸入密碼"
+                class="w-full bg-white border border-stone-300 p-2 text-sm focus:outline-none focus:border-red-400"
+              />
+            </div>
+            <div>
+              <label class="block text-xs text-stone-600 mb-1">
+                請輸入
+                <span class="font-mono font-bold text-red-600">DELETE</span>
+                以確認
+              </label>
+              <input
+                type="text"
+                v-model="deleteForm.confirmText"
+                placeholder="DELETE"
+                class="w-full bg-white border border-stone-300 p-2 text-sm focus:outline-none focus:border-red-400 font-mono"
+              />
+            </div>
+            <p v-if="deleteError" class="text-sm text-red-600">
+              {{ deleteError }}
+            </p>
+            <div class="flex gap-2">
+              <button
+                @click="cancelDeleteAccount"
+                :disabled="isDeletingAccount"
+                class="px-4 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50 disabled:opacity-50"
+              >
+                取消
+              </button>
+              <button
+                @click="handleDeleteAccount"
+                :disabled="
+                  isDeletingAccount || deleteForm.confirmText !== 'DELETE'
+                "
+                class="px-4 py-2 bg-red-600 text-white text-xs uppercase tracking-widest hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <span
+                  v-if="isDeletingAccount"
+                  class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></span>
+                {{ isDeletingAccount ? "刪除中..." : "刪除" }}
+              </button>
             </div>
           </div>
         </div>

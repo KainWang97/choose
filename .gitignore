@@ -10,3 +10,6 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Deployment log
+deployment_log.md
