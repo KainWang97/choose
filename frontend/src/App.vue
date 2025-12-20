@@ -113,11 +113,9 @@ onMounted(async () => {
       }
     }
 
-    const [featuredIds, featuredProducts] = await Promise.all([
-      api.featured.getAll(),
-      api.featured.getProducts(),
-    ]);
-    featuredProductIds.value = featuredIds;
+    // 只調用一次 API，從結果中提取 ID（優化：避免雙重請求）
+    const featuredProducts = await api.featured.getProducts();
+    featuredProductIds.value = featuredProducts.map((p) => p.id);
     newArrivalsProducts.value = featuredProducts;
 
     // 處理 URL query 參數 (例如 showLogin)
@@ -718,12 +716,9 @@ const handleToggleFeatured = async (productId) => {
     // 重新載入產品列表以更新 isFeatured 狀態
     await reloadProductsForCurrentRole();
 
-    // 重新載入新品上架列表
-    const [ids, prods] = await Promise.all([
-      api.featured.getAll(),
-      api.featured.getProducts(),
-    ]);
-    featuredProductIds.value = ids;
+    // 重新載入新品上架列表（優化：單一 API 調用）
+    const prods = await api.featured.getProducts();
+    featuredProductIds.value = prods.map((p) => p.id);
     newArrivalsProducts.value = prods;
   } catch (error) {
     console.error("Failed to toggle featured:", error);

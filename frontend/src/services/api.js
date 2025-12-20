@@ -802,18 +802,9 @@ export const categoryApi = {
 // ============================================
 // Featured Products API (已實作後端 API)
 // ============================================
-const MAX_FEATURED = 5;
+export const MAX_FEATURED = 5;
 
 export const featuredApi = {
-  /**
-   * 取得所有新品上架商品 IDs
-   * @returns {Promise<string[]>}
-   */
-  async getAll() {
-    const products = await this.getProducts();
-    return products.map((p) => p.id);
-  },
-
   /**
    * 取得新品上架商品列表
    * @returns {Promise<import('../types.js').Product[]>}
@@ -836,32 +827,6 @@ export const featuredApi = {
       isFeatured: data.isFeatured,
       message: data.isFeatured ? "已加入新品上架" : "已從新品上架移除",
     };
-  },
-
-  /**
-   * 新增商品到新品上架 (透過 toggle 實作)
-   * @param {string} productId
-   * @returns {Promise<{ success: boolean; message: string }>}
-   */
-  async add(productId) {
-    const result = await this.toggle(productId);
-    if (result.isFeatured) {
-      return { success: true, message: "已加入新品上架" };
-    }
-    return { success: false, message: "操作失敗" };
-  },
-
-  /**
-   * 從新品上架移除商品 (透過 toggle 實作)
-   * @param {string} productId
-   * @returns {Promise<{ success: boolean; message: string }>}
-   */
-  async remove(productId) {
-    const result = await this.toggle(productId);
-    if (!result.isFeatured) {
-      return { success: true, message: "已從新品上架移除" };
-    }
-    return { success: false, message: "操作失敗" };
   },
 };
 
