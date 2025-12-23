@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Choose 電商後端專案架構說明</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown-light.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css"
+    />
+    <style>
+      :root {
+        --primary-blue: #3d3d3d;
+        --primary-hover: #2a2a2a;
+        --bg-color: #f5f5f7;
+        --text-primary: #1d1d1f;
+        --text-secondary: #6e6e73;
+        color-scheme: light;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background-color: var(--bg-color);
+        margin: 0;
+        padding-top: 80px;
+        font-family: "SF Pro TC", "SF Pro Text", "PingFang TC", -apple-system,
+          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .author {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+      .top-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 75px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        z-index: 2000;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 1.35rem;
+        color: #0f172a;
+      }
+      .logo-icon {
+        width: 38px;
+        height: 38px;
+        background: var(--primary-blue);
+        border-radius: 2px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto 80px;
+        background: white;
+        padding: 60px 80px;
+        border-radius: 24px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .markdown-body {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #1f2328 !important;
+        background-color: transparent !important;
+      }
+      .markdown-body code:not(pre code) {
+        background-color: rgba(175, 184, 193, 0.2) !important;
+        color: #0550ae !important;
+        padding: 0.2em 0.4em;
+        border-radius: 6px;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .markdown-body pre {
+        background-color: #f6f8fa !important;
+        border-radius: 12px;
+        padding: 16px;
+        overflow-x: auto;
+      }
+      .diagram-box {
+        margin: 40px 0;
+        border: 1px solid #f1f5f9;
+        border-radius: 16px;
+        background: #fafafa;
+        padding: 30px;
+      }
+      .diagram-title {
+        text-align: center;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .mermaid {
+        display: flex;
+        justify-content: center;
+        min-height: 50px;
+      }
+      .btn-export {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .btn-export:hover {
+        background: var(--primary-hover);
+      }
+      /* Back to Top Button */
+      .back-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 44px;
+        height: 44px;
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 1500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .back-to-top:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      .back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      /* Table of Contents Styling */
+      .toc {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 16px;
+        padding: 24px 32px;
+        margin-bottom: 40px;
+      }
+      .toc-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #0f172a;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 24px;
+      }
+      .toc-list li a {
+        color: #475569;
+        text-decoration: none;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        transition: color 0.2s;
+      }
+      .toc-list li a:hover {
+        color: var(--primary-blue);
+      }
+      .toc-list li a::before {
+        content: "→";
+        color: var(--primary-blue);
+        font-weight: 600;
+      }
+      #loading {
+        position: fixed;
+        inset: 0;
+        background: white;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @media print {
+        body {
+          padding-top: 0;
+        }
+        .top-nav,
+        #loading,
+        .toc,
+        .back-to-top {
+          display: none !important;
+        }
+        .container {
+          box-shadow: none;
+          margin: 0;
+          padding: 20px;
+          max-width: 100%;
+        }
+        .diagram-box {
+          page-break-inside: avoid;
+          border: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading">
+      <div class="spinner"></div>
+      <p style="margin-top: 25px; color: #64748b; font-weight: 600">
+        深度架構驗證引擎啟動中...
+      </p>
+    </div>
+
+    <header class="top-nav">
+      <div class="logo">
+        <div class="logo-icon">C</div>
+        <span>Choose Backend Architecture >Verified 8.0</span>
+      </div>
+      <button class="btn-export" onclick="window.print()">
+        匯出成果 (PDF)
+      </button>
+    </header>
+
+    <div class="container">
+      <article class="markdown-body">
+        <h1>架構與技術實作</h1>
+        <p class="author">文件由 Kain W. 監製。</p>
+
+        <!-- TABLE OF CONTENTS -->
+        <nav class="toc">
+          <div class="toc-title">📑 快速導航目錄</div>
+          <ul class="toc-list">
+            <li><a href="#sec-directory">1. 完整專案目錄結構</a></li>
+            <li><a href="#sec-build">1.5 建置工具與套件依賴</a></li>
+            <li><a href="#sec-architecture">2. 系統分層架構圖</a></li>
+            <li><a href="#sec-controller">3.1 Controller 層詳解</a></li>
+            <li><a href="#sec-service">3.2 Service 層詳解</a></li>
+            <li><a href="#sec-repository">3.3 Repository 層詳解</a></li>
+            <li><a href="#sec-model">3.4 Model 層詳解</a></li>
+            <li><a href="#sec-config">3.5 Config 層詳解</a></li>
+            <li><a href="#sec-security">3.6 Security 層詳解</a></li>
+            <li><a href="#sec-dto">3.7 DTO 層詳解</a></li>
+            <li><a href="#sec-common">3.8 Common 層詳解</a></li>
+            <li><a href="#sec-annotation">4. 核心 Annotation 解析</a></li>
+            <li><a href="#sec-auth-flow">5. JWT 認證流程圖</a></li>
+            <li><a href="#sec-order-flow">6. 訂單建立時序圖</a></li>
+            <li><a href="#sec-summary">7. 專案統計摘要</a></li>
+            <li><a href="#sec-controller-detail">8. Controller 方法詳解</a></li>
+            <li><a href="#sec-service-detail">9. Service 方法詳解</a></li>
+            <li>
+              <a href="#sec-repository-detail">10. Repository 方法詳解</a>
+            </li>
+            <li><a href="#sec-model-detail">11. Model 設計詳解</a></li>
+            <li><a href="#sec-dto-detail">12. DTO 轉換詳解</a></li>
+            <li><a href="#sec-config-detail">13. Config 配置詳解</a></li>
+            <li><a href="#sec-security-detail">14. Security 安全詳解</a></li>
+            <li><a href="#sec-common-detail">15. Common 共用詳解</a></li>
+            <li><a href="#sec-collaboration">16. 層級協作關係圖</a></li>
+          </ul>
+        </nav>
+
+        <hr />
+
+        <h2 id="sec-directory">1. 完整專案目錄結構 (Directory Tree)</h2>
+        <p>基底路徑：<code>backend/src/main/java/com/choose/</code></p>
+        <pre><code>com.choose/
+├── BackendApplication.java         # Spring Boot 啟動入口 (@SpringBootApplication)
+├── ServletInitializer.java         # WAR 部署支援 (extends SpringBootServletInitializer)
+│
+├── common/                         # 橫切關注點 (2 個)
+│   ├── ApiResponse.java            # 統一回應封裝 {success, message, data}
+│   └── GlobalExceptionHandler.java # 全域例外處理 (8 種例外類型)
+│
+├── config/                         # 配置模組 (5 個)
+│   ├── CloudinaryConfig.java       # Cloudinary SDK 初始化
+│   ├── DataInitializer.java        # 啟動時建立預設 Admin (admin@choose.com / 123456)
+│   ├── PasswordConfig.java         # BCryptPasswordEncoder Bean
+│   ├── SecurityConfig.java         # Spring Security、CORS、JWT Filter 註冊
+│   └── WebConfig.java              # Spring MVC 擴充 (目前空，CORS 已移至 Security)
+│
+├── controller/                     # 表現層 (9 個)
+│   ├── AuthController.java         # /api/auth - 註冊、登入、登出、JWT Cookie
+│   ├── CartController.java         # /api/cart - 購物車 CRUD
+│   ├── CategoryController.java     # /api/categories - 分類管理 (Admin)
+│   ├── InquiryController.java      # /api/inquiries - 客服留言
+│   ├── OrderController.java        # /api/orders - 訂單建立、狀態更新
+│   ├── ProductController.java      # /api/products - 商品 CRUD、精選切換
+│   ├── ProductVariantController.java  # /api/variants - 規格 (SKU) 管理
+│   ├── UploadController.java       # /api/upload - 圖片上傳至 Cloudinary
+│   └── UserController.java         # /api/users - 個資、密碼變更、帳號刪除
+│
+├── dto/response/                   # 回應 DTO (6 個)
+│   ├── CartItemDTO.java
+│   ├── CategoryDTO.java
+│   ├── InquiryDTO.java
+│   ├── OrderDTO.java               # 含巢狀 OrderItemDTO
+│   ├── ProductDTO.java             # 11 欄位，含 categoryId、聚合庫存
+│   └── ProductVariantDTO.java
+│
+├── model/                          # 領域實體 (8 個 POJO)
+│   ├── CartItem.java
+│   ├── Category.java
+│   ├── ContactMessage.java
+│   ├── Order.java                  # Enum: PENDING/PAID/SHIPPED/COMPLETED/CANCELLED
+│   ├── OrderItem.java
+│   ├── Product.java                # 3 索引、orphanRemoval
+│   ├── ProductVariant.java         # UniqueConstraint(product,color,size)、stock 索引
+│   └── User.java                   # Enum: MEMBER/ADMIN、軟刪除
+│
+├── repository/                     # 持久層 (7 個)
+│   ├── CartItemRepository.java     # deleteByUserUserId()
+│   ├── CategoryRepository.java     # existsByName()
+│   ├── ContactMessageRepository.java
+│   ├── OrderRepository.java        # 5 方法，含 existsByUserUserIdAndStatusIn()
+│   ├── ProductRepository.java      # 5 方法，含 JPQL searchProducts()
+│   ├── ProductVariantRepository.java  # findByProductProductId()
+│   └── UserRepository.java         # findByEmail(), existsByEmail()
+│
+├── security/                       # 安全模組 (2 個)
+│   ├── JwtAuthenticationFilter.java  # 雙路徑 Token 提取 (Cookie / Header)
+│   └── JwtUtil.java                # HMAC-SHA256 簽章、Claims 解析
+│
+└── service/                        # 業務層 (7 個)
+    ├── CartService.java            # 庫存檢查、數量合併
+    ├── CategoryService.java
+    ├── ContactMessageService.java  # markAsRead(), markAsReplied()
+    ├── ImageUploadService.java     # Cloudinary upload (限 jpg/png/gif/webp)
+    ├── OrderService.java           # @Transactional 原子化下單、庫存扣減
+    ├── ProductService.java         # SKU 生成、精選上限 8 件
+    └── UserService.java            # BCrypt 加密、軟刪除去識別化
+</code></pre>
+
+        <hr />
+
+        <h2 id="sec-build">1.5 建置工具與套件依賴</h2>
+        <p><strong>建置工具</strong>：Gradle</p>
+        <p><strong>Java 版本</strong>：17</p>
+        <p><strong>Spring Boot 版本</strong>：4.0.0</p>
+
+        <h3>核心依賴</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>類別</th>
+              <th>套件名稱</th>
+              <th>版本</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Web</td>
+              <td><code>spring-boot-starter-web</code></td>
+              <td>4.0.0</td>
+              <td>REST API、Tomcat 內嵌伺服器</td>
+            </tr>
+            <tr>
+              <td>資料層</td>
+              <td><code>spring-boot-starter-data-jpa</code></td>
+              <td>4.0.0</td>
+              <td>JPA/Hibernate ORM</td>
+            </tr>
+            <tr>
+              <td>安全</td>
+              <td><code>spring-boot-starter-security</code></td>
+              <td>4.0.0</td>
+              <td>認證授權、CORS、CSRF 防護</td>
+            </tr>
+            <tr>
+              <td>驗證</td>
+              <td><code>spring-boot-starter-validation</code></td>
+              <td>4.0.0</td>
+              <td>Bean Validation (@Valid)</td>
+            </tr>
+            <tr>
+              <td>JWT</td>
+              <td><code>io.jsonwebtoken:jjwt-api</code></td>
+              <td>0.12.3</td>
+              <td>HMAC-SHA256 Token 簽發與驗證</td>
+            </tr>
+            <tr>
+              <td>圖片儲存</td>
+              <td><code>com.cloudinary:cloudinary-http5</code></td>
+              <td>2.3.2</td>
+              <td>Cloudinary 圖片上傳 SDK</td>
+            </tr>
+            <tr>
+              <td>資料庫</td>
+              <td><code>mysql-connector-j</code></td>
+              <td>-</td>
+              <td>MySQL JDBC 驅動</td>
+            </tr>
+            <tr>
+              <td>工具</td>
+              <td><code>org.projectlombok:lombok</code></td>
+              <td>1.18.34</td>
+              <td>減少樣板程式碼 (@Data, @RequiredArgsConstructor)</td>
+            </tr>
+            <tr>
+              <td>文檔</td>
+              <td><code>springdoc-openapi-starter-webmvc-ui</code></td>
+              <td>3.0.0</td>
+              <td>Swagger UI 自動生成 API 文檔</td>
+            </tr>
+            <tr>
+              <td>監控</td>
+              <td><code>spring-boot-starter-actuator</code></td>
+              <td>4.0.0</td>
+              <td>健康檢查、應用程式指標</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr />
+
+        <h2 id="sec-architecture">2. 系統分層架構圖 (Layered Architecture)</h2>
+        <div class="diagram-box">
+          <div class="diagram-title">請求生命週期與各層職責</div>
+          <div class="mermaid" id="diagram-layered"></div>
+        </div>
+
+        <hr />
+
+        <h2>3. 各層技術實作深度解析</h2>
+
+        <h3 id="sec-controller">3.1 Controller 層 (表現層) - 9 個控制器</h3>
+        <p>
+          <strong>職責</strong>：接收 HTTP 請求、Bean Validation、調用
+          Service、組裝 ApiResponse。<strong>禁止包含業務邏輯</strong>。
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>控制器</th>
+              <th>路由</th>
+              <th>方法數</th>
+              <th>技術亮點</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>AuthController</code></td>
+              <td>/api/auth</td>
+              <td>4</td>
+              <td>
+                JWT 雙軌發放（HttpOnly Cookie + Response Body）、<code
+                  >@Value</code
+                >
+                讀取過期時間
+              </td>
+            </tr>
+            <tr>
+              <td><code>CartController</code></td>
+              <td>/api/cart</td>
+              <td>5</td>
+              <td>
+                <code>@AuthenticationPrincipal</code> 注入 User、巢狀 Request
+                DTO
+              </td>
+            </tr>
+            <tr>
+              <td><code>CategoryController</code></td>
+              <td>/api/categories</td>
+              <td>5</td>
+              <td>
+                <code>@PreAuthorize("hasRole('ADMIN')")</code> 保護寫入操作
+              </td>
+            </tr>
+            <tr>
+              <td><code>InquiryController</code></td>
+              <td>/api/inquiries</td>
+              <td>6</td>
+              <td>擷取 <code>X-Forwarded-For</code> 取得真實 IP</td>
+            </tr>
+            <tr>
+              <td><code>OrderController</code></td>
+              <td>/api/orders</td>
+              <td>7</td>
+              <td>POST 時 Service 內部執行庫存扣減、PATCH 付款備註</td>
+            </tr>
+            <tr>
+              <td><code>ProductController</code></td>
+              <td>/api/products</td>
+              <td>13</td>
+              <td>
+                /admin/all 列出全部（含未上架）、/featured 精選、CRUD、庫存更新
+              </td>
+            </tr>
+            <tr>
+              <td><code>ProductVariantController</code></td>
+              <td>/api/variants</td>
+              <td>5</td>
+              <td>SKU 自動生成由 Service 處理、規格 CRUD + 庫存更新</td>
+            </tr>
+            <tr>
+              <td><code>UploadController</code></td>
+              <td>/api/upload</td>
+              <td>1</td>
+              <td>
+                <code>@RequestParam("file") MultipartFile</code>、Cloudinary SDK
+              </td>
+            </tr>
+            <tr>
+              <td><code>UserController</code></td>
+              <td>/api/users</td>
+              <td>6</td>
+              <td>帳號刪除使用 POST (支援 Request Body)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 12px">
+          📌 <strong>備註</strong>：方法數僅統計「公開 API
+          Endpoint」，不含內部私有輔助方法（如
+          <code>createAuthCookie()</code>、<code>getClientIpAddress()</code>
+          等）。實際程式碼中 AuthController 有 6 個方法（含 2
+          個私有）、InquiryController 有 7 個（含 1 個私有）。
+        </p>
+
+        <h3 id="sec-service">3.2 Service 層 (業務邏輯層) - 7 個服務</h3>
+        <p>
+          <strong>職責</strong>：封裝業務規則、<code>@Transactional</code>
+          交易管理、跨 Repository 協調。
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>服務</th>
+              <th>關鍵方法</th>
+              <th>商業邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>UserService</code></td>
+              <td>
+                <code>register()</code>, <code>deleteUserAccount()</code>,
+                <code>changePassword()</code>
+              </td>
+              <td>
+                BCrypt 加密；刪除時檢查活躍訂單 → 去識別化（UUID 替換 Email）→
+                清空購物車 → 軟刪除
+              </td>
+            </tr>
+            <tr>
+              <td><code>ProductService</code></td>
+              <td>
+                <code>toggleFeatured()</code>, <code>createVariant()</code>
+              </td>
+              <td>
+                精選上限 8 件（countByIsFeaturedTrue）；SKU =
+                <code>P{id}-{COLOR}-{SIZE}-{random}</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>OrderService</code></td>
+              <td>
+                <code>createOrder()</code>, <code>hasActiveOrders()</code>
+              </td>
+              <td>
+                <strong>@Transactional</strong>：取出 Variant → 驗證庫存 → 扣減
+                → 存訂單。Rollback on Exception
+              </td>
+            </tr>
+            <tr>
+              <td><code>CartService</code></td>
+              <td><code>addToCart()</code>, <code>updateQuantity()</code></td>
+              <td>新增時若已存在則合併數量；更新時驗證庫存</td>
+            </tr>
+            <tr>
+              <td><code>ImageUploadService</code></td>
+              <td><code>uploadImage()</code></td>
+              <td>
+                檢查 MIME 類型（image/jpeg|png|gif|webp）→ Cloudinary upload
+              </td>
+            </tr>
+            <tr>
+              <td><code>ContactMessageService</code></td>
+              <td><code>markAsRead()</code>, <code>markAsReplied()</code></td>
+              <td>更新 isRead / isReplied 欄位</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-repository">
+          3.3 Repository 層 (持久層) - 7 個 Repository
+        </h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Repository</th>
+              <th>繼承</th>
+              <th>自訂方法</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ProductRepository</code></td>
+              <td>JpaRepository</td>
+              <td>
+                5 個：<code>findByIsListedTrue()</code>,
+                <code>searchProducts()</code> (JPQL),
+                <code>countByIsFeaturedTrue()</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>OrderRepository</code></td>
+              <td>JpaRepository</td>
+              <td>
+                5 個：<code>existsByUserUserIdAndStatusIn()</code> 檢查活躍訂單
+              </td>
+            </tr>
+            <tr>
+              <td><code>UserRepository</code></td>
+              <td>JpaRepository</td>
+              <td><code>findByEmail()</code>, <code>existsByEmail()</code></td>
+            </tr>
+            <tr>
+              <td><code>CartItemRepository</code></td>
+              <td>JpaRepository</td>
+              <td>
+                <code>findByUserUserId()</code>,
+                <code>deleteByUserUserId()</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-model">3.4 Model 層 (領域實體) - 8 個 POJO</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>實體</th>
+              <th>關鍵 Annotation</th>
+              <th>設計重點</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>User</code></td>
+              <td>
+                <code>@PrePersist</code>, <code>@Enumerated(STRING)</code>
+              </td>
+              <td>Role: MEMBER/ADMIN；軟刪除（isDeleted + deletedAt）</td>
+            </tr>
+            <tr>
+              <td><code>Product</code></td>
+              <td>
+                <code>@Table(indexes)</code>,
+                <code>@OneToMany(orphanRemoval)</code>
+              </td>
+              <td>
+                3 索引（category_listed, name,
+                created_at）；刪除商品時連帶刪除規格
+              </td>
+            </tr>
+            <tr>
+              <td><code>ProductVariant</code></td>
+              <td>
+                <code>@UniqueConstraint</code>, <code>@Index(stock)</code>
+              </td>
+              <td>
+                複合唯一約束（product_id + color + size）；stock
+                索引優化庫存查詢
+              </td>
+            </tr>
+            <tr>
+              <td><code>Order</code></td>
+              <td><code>@Table(indexes)</code>, <code>@Enumerated</code></td>
+              <td>
+                3 索引；狀態 Enum：PENDING → PAID → SHIPPED → COMPLETED /
+                CANCELLED
+              </td>
+            </tr>
+            <tr>
+              <td><code>OrderItem</code></td>
+              <td><code>@ManyToOne</code></td>
+              <td>快照 price，避免商品調價影響歷史訂單</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-config">3.5 Config 層 (配置模組) - 5 個</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>配置類別</th>
+              <th>實作細節</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>SecurityConfig</code></td>
+              <td>
+                CORS 白名單（localhost:5173/5174/3000 + Zeabur）、CSRF
+                關閉、Stateless Session、JWT Filter 註冊於 UsernamePassword 之前
+              </td>
+            </tr>
+            <tr>
+              <td><code>DataInitializer</code></td>
+              <td>
+                實作 <code>CommandLineRunner</code>，啟動時建立 admin@choose.com
+                / 123456
+              </td>
+            </tr>
+            <tr>
+              <td><code>PasswordConfig</code></td>
+              <td>獨立宣告 <code>BCryptPasswordEncoder</code> 避免循環依賴</td>
+            </tr>
+            <tr>
+              <td><code>CloudinaryConfig</code></td>
+              <td>讀取環境變數 CLOUDINARY_URL 初始化 SDK</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-security">3.6 Security 層 (安全模組) - 2 個</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>元件</th>
+              <th>實作細節</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>JwtUtil</code></td>
+              <td>
+                HMAC-SHA256 簽章；Claims 含 userId, email, role；驗證過期 + 簽章
+              </td>
+            </tr>
+            <tr>
+              <td><code>JwtAuthenticationFilter</code></td>
+              <td>
+                優先從 Cookie(auth_token) 提取，其次 Authorization
+                Header；驗證後注入 UsernamePasswordAuthenticationToken
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-dto">3.7 DTO 層 (資料傳輸物件) - 6 個</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>DTO</th>
+              <th>欄位數</th>
+              <th>特殊處理</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ProductDTO</code></td>
+              <td>11</td>
+              <td>productId → id, imageUrl → image, 聚合 variants 庫存總和</td>
+            </tr>
+            <tr>
+              <td><code>OrderDTO</code></td>
+              <td>13</td>
+              <td>
+                巢狀 <code>OrderItemDTO</code>（含 productName, skuCode,
+                subtotal 計算）
+              </td>
+            </tr>
+            <tr>
+              <td><code>CartItemDTO</code></td>
+              <td>-</td>
+              <td>展開 Variant 資訊供前端顯示</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-common">3.8 Common 層 (橫切關注點) - 2 個</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>元件</th>
+              <th>實作細節</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ApiResponse&lt;T&gt;</code></td>
+              <td>
+                3 欄位：success, message, data；3
+                靜態方法：<code>success(data)</code>,
+                <code>success(msg, data)</code>, <code>error(msg)</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>GlobalExceptionHandler</code></td>
+              <td>
+                @RestControllerAdvice 處理
+                <strong>8 種例外</strong>：MethodArgumentNotValid,
+                IllegalArgument, EntityNotFound, AccessDenied, BadCredentials,
+                NoHandlerFound, Runtime, Exception
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr />
+
+        <h2 id="sec-annotation">4. 核心 Annotation 深度解析</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Annotation</th>
+              <th>層級</th>
+              <th>使用原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>@Transactional</code></td>
+              <td>Service</td>
+              <td>
+                確保 createOrder 的庫存扣減 +
+                訂單存檔為原子操作；RuntimeException 自動 Rollback
+              </td>
+            </tr>
+            <tr>
+              <td><code>@PreAuthorize</code></td>
+              <td>Controller</td>
+              <td>SpEL 表達式檢查 hasRole('ADMIN')，比 URL 配置更精細</td>
+            </tr>
+            <tr>
+              <td><code>@AuthenticationPrincipal</code></td>
+              <td>Controller</td>
+              <td>從 SecurityContext 注入 User 物件，避免手動查表</td>
+            </tr>
+            <tr>
+              <td><code>@PrePersist</code></td>
+              <td>Model</td>
+              <td>INSERT 前自動填入 createdAt，確保 audit 一致性</td>
+            </tr>
+            <tr>
+              <td><code>@ManyToOne(fetch=LAZY)</code></td>
+              <td>Model</td>
+              <td>延遲載入關聯物件，減少不必要的 JOIN 查詢</td>
+            </tr>
+            <tr>
+              <td><code>@Table(indexes)</code></td>
+              <td>Model</td>
+              <td>建立 DB 索引優化 WHERE/ORDER BY 效能</td>
+            </tr>
+            <tr>
+              <td><code>@UniqueConstraint</code></td>
+              <td>Model</td>
+              <td>ProductVariant 複合唯一約束防止重複規格</td>
+            </tr>
+            <tr>
+              <td><code>@RestControllerAdvice</code></td>
+              <td>Common</td>
+              <td>全域例外攔截器，回傳標準化 ApiResponse 錯誤格式</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr />
+
+        <h2 id="sec-auth-flow">5. JWT 認證授權流程時序圖</h2>
+        <div class="diagram-box">
+          <div class="diagram-title">JWT 認證與 SecurityContext 注入</div>
+          <div class="mermaid" id="diagram-auth"></div>
+        </div>
+
+        <hr />
+
+        <h2 id="sec-order-flow">6. 訂單建立交易時序圖</h2>
+        <div class="diagram-box">
+          <div class="diagram-title">Order Creation Lifecycle</div>
+          <div class="mermaid" id="diagram-order"></div>
+        </div>
+
+        <hr />
+
+        <h2 id="sec-summary">7. 專案統計摘要</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>層級</th>
+              <th>檔案數</th>
+              <th>代表性檔案</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Controller</td>
+              <td>9</td>
+              <td>AuthController, OrderController, ProductController</td>
+            </tr>
+            <tr>
+              <td>Service</td>
+              <td>7</td>
+              <td>OrderService, ProductService, UserService</td>
+            </tr>
+            <tr>
+              <td>Repository</td>
+              <td>7</td>
+              <td>ProductRepository (JPQL), OrderRepository</td>
+            </tr>
+            <tr>
+              <td>Model</td>
+              <td>8</td>
+              <td>User, Product, Order, ProductVariant</td>
+            </tr>
+            <tr>
+              <td>DTO</td>
+              <td>6</td>
+              <td>ProductDTO (11 欄位), OrderDTO (巢狀)</td>
+            </tr>
+            <tr>
+              <td>Config</td>
+              <td>5</td>
+              <td>SecurityConfig, DataInitializer</td>
+            </tr>
+            <tr>
+              <td>Security</td>
+              <td>2</td>
+              <td>JwtUtil, JwtAuthenticationFilter</td>
+            </tr>
+            <tr>
+              <td>Common</td>
+              <td>2</td>
+              <td>ApiResponse (3 方法), GlobalExceptionHandler (8 例外)</td>
+            </tr>
+            <tr>
+              <td><strong>總計</strong></td>
+              <td><strong>48</strong></td>
+              <td>（含 BackendApplication + ServletInitializer）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr />
+        <p style="text-align: center; color: #94a3b8; font-size: 0.8rem">
+          © 2025 Choose Studio. Verified Edition 8.2 | 交叉比對 48 個原始檔完成
+          | 掃描時間：2025-12-21 15:57
+        </p>
+
+        <!-- ========== SECTION 8: CONTROLLER 方法詳解 ========== -->
+        <hr />
+        <h2 id="sec-controller-detail">8. Controller 方法詳解</h2>
+        <p>
+          以下針對每個 Controller 的 API 方法進行深度解析，包含 Annotation
+          語法、企業邏輯與協作關係。
+        </p>
+
+        <!-- 8.1 AuthController -->
+        <h3>8.1 AuthController</h3>
+        <p>
+          <strong>職責</strong>：處理用戶認證（註冊、登入、登出）、JWT Token
+          管理。
+        </p>
+        <p><strong>路由前綴</strong>：<code>/api/auth</code></p>
+        <p>
+          <strong>依賴注入</strong
+          >：<code>UserService</code>、<code>JwtUtil</code>、<code
+            >PasswordEncoder</code
+          >
+        </p>
+
+        <h4>8.1.1 register()</h4>
+        <pre><code class="language-java">@PostMapping("/register")
+public ResponseEntity&lt;ApiResponse&lt;UserResponse&gt;&gt; register(
+    @Valid @RequestBody RegisterRequest request)</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>Annotation</th>
+              <th>位置</th>
+              <th>意義</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>@PostMapping("/register")</code></td>
+              <td>方法</td>
+              <td>映射 HTTP POST 請求至 <code>/api/auth/register</code></td>
+            </tr>
+            <tr>
+              <td><code>@Valid</code></td>
+              <td>參數</td>
+              <td>啟用 Bean Validation，驗證 RegisterRequest 欄位約束</td>
+            </tr>
+            <tr>
+              <td><code>@RequestBody</code></td>
+              <td>參數</td>
+              <td>將 HTTP Body 的 JSON 自動反序列化為 Java 物件</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>企業邏輯</strong>：</p>
+        <ol>
+          <li>檢查 Email 是否已被註冊 → 防止重複帳號</li>
+          <li>BCrypt 加密密碼 → 資料庫不存明文</li>
+          <li>生成 JWT Token → 註冊後自動登入</li>
+          <li>設置 HttpOnly Cookie → 防止 XSS 攻擊</li>
+        </ol>
+        <p>
+          <strong>協作</strong>：<code>UserService.register()</code> →
+          <code>JwtUtil.generateToken()</code>
+        </p>
+
+        <h4>8.1.2 login()</h4>
+        <pre><code class="language-java">@PostMapping("/login")
+public ResponseEntity&lt;ApiResponse&lt;UserResponse&gt;&gt; login(
+    @Valid @RequestBody LoginRequest request)</code></pre>
+        <p><strong>企業邏輯</strong>：</p>
+        <ol>
+          <li>查詢用戶 → <code>UserService.findByEmail()</code></li>
+          <li>驗證密碼 → <code>PasswordEncoder.matches()</code></li>
+          <li>生成 JWT → 雙軌發放（Cookie + Response Body）</li>
+        </ol>
+        <p><strong>名詞解釋</strong>：</p>
+        <ul>
+          <li>
+            <code>BCrypt</code
+            >：密碼雜湊演算法，單向加密且含隨機鹽值，每次加密結果不同
+          </li>
+          <li>
+            <code>HttpOnly Cookie</code>：JavaScript 無法存取的 Cookie，防止 XSS
+            盜取 Token
+          </li>
+          <li>
+            <code>SameSite=None</code>：允許跨域請求攜帶 Cookie，需配合
+            <code>Secure=true</code>
+          </li>
+        </ul>
+
+        <h4>8.1.3 getCurrentUser()</h4>
+        <pre><code class="language-java">@GetMapping("/me")
+public ResponseEntity&lt;ApiResponse&lt;UserResponse&gt;&gt; getCurrentUser(
+    @AuthenticationPrincipal User user)</code></pre>
+        <p><strong>Annotation 解析</strong>：</p>
+        <ul>
+          <li>
+            <code>@AuthenticationPrincipal</code>：從 SecurityContext
+            取得當前已認證用戶，由 JwtAuthenticationFilter 注入
+          </li>
+        </ul>
+
+        <h4>8.1.4 logout()</h4>
+        <pre><code class="language-java">@PostMapping("/logout")
+public ResponseEntity&lt;ApiResponse&lt;String&gt;&gt; logout(
+    @AuthenticationPrincipal User user)</code></pre>
+        <p>
+          <strong>企業邏輯</strong>：清除 HttpOnly Cookie（設置 maxAge=0），使
+          Token 在瀏覽器端失效。
+        </p>
+
+        <!-- 8.2 CartController -->
+        <h3>8.2 CartController</h3>
+        <p><strong>職責</strong>：購物車管理（新增、修改數量、移除、清空）。</p>
+        <p><strong>路由前綴</strong>：<code>/api/cart</code></p>
+        <p><strong>依賴注入</strong>：<code>CartService</code></p>
+
+        <h4>8.2.1 getCart()</h4>
+        <pre><code class="language-java">@GetMapping
+public ResponseEntity&lt;ApiResponse&lt;List&lt;CartItemDTO&gt;&gt;&gt; getCart(
+    @AuthenticationPrincipal User user)</code></pre>
+        <p>
+          <strong>企業邏輯</strong>：取得用戶購物車內容，轉換為 DTO
+          回傳（含商品名稱、價格、規格資訊）。
+        </p>
+
+        <h4>8.2.2 addToCart()</h4>
+        <pre><code class="language-java">@PostMapping
+public ResponseEntity&lt;ApiResponse&lt;CartItemDTO&gt;&gt; addToCart(
+    @AuthenticationPrincipal User user,
+    @Valid @RequestBody AddToCartRequest request)</code></pre>
+        <p><strong>企業邏輯</strong>：</p>
+        <ol>
+          <li>若購物車已有相同規格 → 合併數量</li>
+          <li>驗證庫存 → 庫存不足拋出例外</li>
+          <li>新增 CartItem 至資料庫</li>
+        </ol>
+
+        <h4>8.2.3 updateQuantity()</h4>
+        <pre><code class="language-java">@PutMapping("/{cartItemId}")
+public ResponseEntity&lt;ApiResponse&lt;CartItemDTO&gt;&gt; updateQuantity(
+    @AuthenticationPrincipal User user,
+    @PathVariable Long cartItemId,
+    @Valid @RequestBody UpdateQuantityRequest request)</code></pre>
+        <p><strong>Annotation 解析</strong>：</p>
+        <ul>
+          <li>
+            <code>@PathVariable</code>：從 URL 路徑提取參數，如
+            <code>/api/cart/123</code> 中的 <code>123</code>
+          </li>
+        </ul>
+        <p>
+          <strong>企業邏輯</strong
+          >：驗證所有權（只能修改自己的購物車項目）、驗證庫存。
+        </p>
+
+        <h4>8.2.4 removeFromCart()</h4>
+        <pre><code class="language-java">@DeleteMapping("/{cartItemId}")
+public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; removeFromCart(
+    @AuthenticationPrincipal User user,
+    @PathVariable Long cartItemId)</code></pre>
+        <p><strong>企業邏輯</strong>：驗證所有權後刪除單一購物車項目。</p>
+
+        <h4>8.2.5 clearCart()</h4>
+        <pre><code class="language-java">@DeleteMapping
+public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; clearCart(
+    @AuthenticationPrincipal User user)</code></pre>
+        <p>
+          <strong>企業邏輯</strong
+          >：清空用戶所有購物車項目，通常在訂單建立成功後由前端調用。
+        </p>
+
+        <!-- 8.3 CategoryController -->
+        <h3>8.3 CategoryController</h3>
+        <p><strong>職責</strong>：商品分類 CRUD（前台讀取、後台管理）。</p>
+        <p><strong>路由前綴</strong>：<code>/api/categories</code></p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>路由</th>
+              <th>權限</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllCategories()</td>
+              <td>GET /</td>
+              <td>公開</td>
+              <td>列出所有分類</td>
+            </tr>
+            <tr>
+              <td>getCategoryById()</td>
+              <td>GET /{id}</td>
+              <td>公開</td>
+              <td>取得單一分類</td>
+            </tr>
+            <tr>
+              <td>createCategory()</td>
+              <td>POST /</td>
+              <td>ADMIN</td>
+              <td>新增分類</td>
+            </tr>
+            <tr>
+              <td>updateCategory()</td>
+              <td>PUT /{id}</td>
+              <td>ADMIN</td>
+              <td>更新分類</td>
+            </tr>
+            <tr>
+              <td>deleteCategory()</td>
+              <td>DELETE /{id}</td>
+              <td>ADMIN</td>
+              <td>刪除分類</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>權限控制 Annotation</strong>：</p>
+        <pre><code class="language-java">@PreAuthorize("hasRole('ADMIN')")</code></pre>
+        <p>使用 Spring Security Method Security，在方法執行前驗證用戶角色。</p>
+
+        <!-- 8.4 InquiryController -->
+        <h3>8.4 InquiryController</h3>
+        <p>
+          <strong>職責</strong>：客服留言管理（用戶提交、管理員查看/標記狀態）。
+        </p>
+        <p><strong>路由前綴</strong>：<code>/api/inquiries</code></p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>路由</th>
+              <th>權限</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllInquiries()</td>
+              <td>GET /</td>
+              <td>ADMIN</td>
+              <td>列出所有留言（按時間降序）</td>
+            </tr>
+            <tr>
+              <td>getInquiryById()</td>
+              <td>GET /{id}</td>
+              <td>ADMIN</td>
+              <td>取得單一留言</td>
+            </tr>
+            <tr>
+              <td>createInquiry()</td>
+              <td>POST /</td>
+              <td>公開</td>
+              <td>提交留言（可匿名）</td>
+            </tr>
+            <tr>
+              <td>markAsRead()</td>
+              <td>PATCH /{id}/read</td>
+              <td>ADMIN</td>
+              <td>標記為已讀</td>
+            </tr>
+            <tr>
+              <td>markAsReplied()</td>
+              <td>PATCH /{id}/reply</td>
+              <td>ADMIN</td>
+              <td>標記為已回覆</td>
+            </tr>
+            <tr>
+              <td>deleteInquiry()</td>
+              <td>DELETE /{id}</td>
+              <td>ADMIN</td>
+              <td>刪除留言</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>特殊功能</strong>：<code>createInquiry()</code> 會擷取
+          <code>X-Forwarded-For</code> Header 取得用戶真實
+          IP（用於反垃圾留言）。
+        </p>
+
+        <!-- 8.5 OrderController -->
+        <h3>8.5 OrderController</h3>
+        <p><strong>職責</strong>：訂單管理（建立、查詢、狀態更新）。</p>
+        <p><strong>路由前綴</strong>：<code>/api/orders</code></p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>路由</th>
+              <th>權限</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllOrders()</td>
+              <td>GET /</td>
+              <td>ADMIN</td>
+              <td>列出所有訂單</td>
+            </tr>
+            <tr>
+              <td>getMyOrders()</td>
+              <td>GET /my</td>
+              <td>認證</td>
+              <td>取得當前用戶訂單</td>
+            </tr>
+            <tr>
+              <td>getUserOrders()</td>
+              <td>GET /user/{userId}</td>
+              <td>ADMIN</td>
+              <td>取得指定用戶訂單</td>
+            </tr>
+            <tr>
+              <td>getOrderById()</td>
+              <td>GET /{id}</td>
+              <td>認證</td>
+              <td>取得單一訂單</td>
+            </tr>
+            <tr>
+              <td>createOrder()</td>
+              <td>POST /</td>
+              <td>認證</td>
+              <td>建立訂單（含庫存扣減）</td>
+            </tr>
+            <tr>
+              <td>updateOrderStatus()</td>
+              <td>PATCH /{id}/status</td>
+              <td>ADMIN</td>
+              <td>更新訂單狀態</td>
+            </tr>
+            <tr>
+              <td>updatePaymentNote()</td>
+              <td>PATCH /{id}/payment-note</td>
+              <td>認證</td>
+              <td>更新付款備註</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>createOrder() 企業邏輯</h4>
+        <ol>
+          <li>驗證用戶身份</li>
+          <li>建立 Order 物件（含運送資訊）</li>
+          <li>轉換 Request Items 為 OrderItems</li>
+          <li>
+            調用 <code>OrderService.createOrder()</code>（@Transactional）
+          </li>
+          <li>Service 內部執行庫存扣減 + 訂單儲存</li>
+        </ol>
+
+        <!-- 8.6 ProductController -->
+        <h3>8.6 ProductController</h3>
+        <p><strong>職責</strong>：商品管理（CRUD、搜尋、精選切換）。</p>
+        <p><strong>路由前綴</strong>：<code>/api/products</code></p>
+        <p>
+          <strong>依賴注入</strong>：<code>ProductService</code>、<code
+            >CategoryService</code
+          >
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>路由</th>
+              <th>權限</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllProducts()</td>
+              <td>GET /</td>
+              <td>公開</td>
+              <td>列出已上架商品</td>
+            </tr>
+            <tr>
+              <td>getProductById()</td>
+              <td>GET /{id}</td>
+              <td>公開</td>
+              <td>取得單一商品</td>
+            </tr>
+            <tr>
+              <td>getProductsByCategory()</td>
+              <td>GET /category/{id}</td>
+              <td>公開</td>
+              <td>分類篩選</td>
+            </tr>
+            <tr>
+              <td>searchProducts()</td>
+              <td>GET /search</td>
+              <td>公開</td>
+              <td>關鍵字搜尋</td>
+            </tr>
+            <tr>
+              <td>getProductVariants()</td>
+              <td>GET /{id}/variants</td>
+              <td>公開</td>
+              <td>取得商品規格</td>
+            </tr>
+            <tr>
+              <td>getFeaturedProducts()</td>
+              <td>GET /featured</td>
+              <td>公開</td>
+              <td>取得精選商品</td>
+            </tr>
+            <tr>
+              <td>getAllProductsAdmin()</td>
+              <td>GET /admin/all</td>
+              <td>ADMIN</td>
+              <td>列出全部商品（含未上架）</td>
+            </tr>
+            <tr>
+              <td>createProduct()</td>
+              <td>POST /</td>
+              <td>ADMIN</td>
+              <td>新增商品</td>
+            </tr>
+            <tr>
+              <td>updateProduct()</td>
+              <td>PUT /{id}</td>
+              <td>ADMIN</td>
+              <td>更新商品</td>
+            </tr>
+            <tr>
+              <td>deleteProduct()</td>
+              <td>DELETE /{id}</td>
+              <td>ADMIN</td>
+              <td>刪除商品</td>
+            </tr>
+            <tr>
+              <td>updateProductStock()</td>
+              <td>PATCH /{id}/stock</td>
+              <td>ADMIN</td>
+              <td>更新庫存</td>
+            </tr>
+            <tr>
+              <td>toggleFeatured()</td>
+              <td>PATCH /{id}/featured</td>
+              <td>ADMIN</td>
+              <td>切換精選狀態</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>精選上限檢查</strong>：<code>toggleFeatured()</code> 調用
+          <code>ProductService.toggleFeatured()</code>，內部檢查精選商品不超過 8
+          件。
+        </p>
+
+        <!-- 8.7 ProductVariantController -->
+        <h3>8.7 ProductVariantController</h3>
+        <p><strong>職責</strong>：商品規格（SKU）管理。</p>
+        <p><strong>路由前綴</strong>：<code>/api/variants</code></p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>路由</th>
+              <th>權限</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getVariantsByProduct()</td>
+              <td>GET /product/{id}</td>
+              <td>公開</td>
+              <td>取得商品規格列表</td>
+            </tr>
+            <tr>
+              <td>createVariant()</td>
+              <td>POST /</td>
+              <td>ADMIN</td>
+              <td>新增規格（SKU 自動生成）</td>
+            </tr>
+            <tr>
+              <td>updateVariant()</td>
+              <td>PUT /{id}</td>
+              <td>ADMIN</td>
+              <td>更新規格</td>
+            </tr>
+            <tr>
+              <td>updateStock()</td>
+              <td>PATCH /{id}/stock</td>
+              <td>ADMIN</td>
+              <td>更新庫存</td>
+            </tr>
+            <tr>
+              <td>deleteVariant()</td>
+              <td>DELETE /{id}</td>
+              <td>ADMIN</td>
+              <td>刪除規格</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>SKU 自動生成</strong>：由
+          <code>ProductService.generateUniqueSku()</code> 處理，格式為
+          <code>{PRODUCT_ABBR}-{COLOR}-{SIZE}-{RANDOM}</code>。
+        </p>
+
+        <!-- 8.8 UploadController -->
+        <h3>8.8 UploadController</h3>
+        <p><strong>職責</strong>：圖片上傳至 Cloudinary。</p>
+        <p><strong>路由前綴</strong>：<code>/api/upload</code></p>
+        <h4>uploadImage()</h4>
+        <pre><code class="language-java">@PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity&lt;ApiResponse&lt;ImageUploadResponse&gt;&gt; uploadImage(
+    @RequestParam("file") MultipartFile file)</code></pre>
+        <p><strong>Annotation 解析</strong>：</p>
+        <ul>
+          <li>
+            <code>consumes = MediaType.MULTIPART_FORM_DATA_VALUE</code>：只接受
+            multipart/form-data 格式
+          </li>
+          <li>
+            <code>@RequestParam("file")</code>：從 form-data 中提取名為 "file"
+            的檔案
+          </li>
+        </ul>
+        <p>
+          <strong>企業邏輯</strong>：驗證檔案類型（jpg/png/gif/webp）→
+          驗證大小（&lt;5MB）→ 上傳至 Cloudinary → 回傳 URL。
+        </p>
+
+        <!-- 8.9 UserController -->
+        <h3>8.9 UserController</h3>
+        <p>
+          <strong>職責</strong
+          >：用戶資料管理（個資查詢/更新、密碼變更、帳號刪除）。
+        </p>
+        <p><strong>路由前綴</strong>：<code>/api/users</code></p>
+        <p>
+          <strong>依賴注入</strong
+          >：<code>UserService</code>、<code>OrderService</code>、<code
+            >CartService</code
+          >
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>路由</th>
+              <th>權限</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getMyProfile()</td>
+              <td>GET /me</td>
+              <td>認證</td>
+              <td>取得當前用戶資料</td>
+            </tr>
+            <tr>
+              <td>updateMyProfile()</td>
+              <td>PUT /me</td>
+              <td>認證</td>
+              <td>更新個資</td>
+            </tr>
+            <tr>
+              <td>getAllUsers()</td>
+              <td>GET /</td>
+              <td>ADMIN</td>
+              <td>列出所有用戶</td>
+            </tr>
+            <tr>
+              <td>getUserById()</td>
+              <td>GET /{id}</td>
+              <td>ADMIN</td>
+              <td>取得指定用戶</td>
+            </tr>
+            <tr>
+              <td>changePassword()</td>
+              <td>PUT /password</td>
+              <td>認證</td>
+              <td>變更密碼</td>
+            </tr>
+            <tr>
+              <td>deleteMyAccount()</td>
+              <td>POST /me/delete</td>
+              <td>認證</td>
+              <td>刪除帳號</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>deleteMyAccount() 企業邏輯</h4>
+        <ol>
+          <li>驗證密碼</li>
+          <li>檢查是否有活躍訂單（PENDING/PAID/SHIPPED）</li>
+          <li>去識別化：Email → <code>deleted-{uuid}@inactive.local</code></li>
+          <li>清空購物車</li>
+          <li>
+            軟刪除：設置 <code>isDeleted=true</code>、<code>deletedAt</code>
+          </li>
+        </ol>
+        <p>
+          <strong>設計原因</strong>：使用 POST 替代 DELETE 是因為 DELETE
+          請求不支援 Request Body（需要密碼驗證）。
+        </p>
+
+        <!-- ========== SECTION 9: SERVICE 方法詳解 ========== -->
+        <hr />
+        <h2 id="sec-service-detail">9. Service 方法詳解</h2>
+        <p>Service 層封裝業務規則，處理跨 Repository 協調與交易管理。</p>
+
+        <h3>9.1 UserService</h3>
+        <p><strong>職責</strong>：用戶相關業務邏輯。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+              <th>關鍵邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>register()</td>
+              <td>用戶註冊</td>
+              <td>Email 唯一檢查 → BCrypt 加密 → 存儲</td>
+            </tr>
+            <tr>
+              <td>findByEmail()</td>
+              <td>查詢用戶</td>
+              <td>登入驗證、JWT 驗證時使用</td>
+            </tr>
+            <tr>
+              <td>findById()</td>
+              <td>ID 查詢</td>
+              <td>Admin 功能、關聯查詢</td>
+            </tr>
+            <tr>
+              <td>findAll()</td>
+              <td>列出所有</td>
+              <td>Admin 用戶管理</td>
+            </tr>
+            <tr>
+              <td>updateUser()</td>
+              <td>更新資料</td>
+              <td>選擇性更新（null 欄位不動）</td>
+            </tr>
+            <tr>
+              <td>changePassword()</td>
+              <td>變更密碼</td>
+              <td>驗舊密碼 → 加密新密碼</td>
+            </tr>
+            <tr>
+              <td>deleteUserAccount()</td>
+              <td>刪除帳號</td>
+              <td>驗密碼 → 檢活躍訂單 → 去識別化 → 軟刪除</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.2 OrderService</h3>
+        <p><strong>職責</strong>：訂單相關業務邏輯。</p>
+        <pre><code class="language-java">@Transactional
+public Order createOrder(Long userId, Order orderData) { ... }</code></pre>
+        <p>
+          <strong>@Transactional 作用</strong
+          >：確保訂單建立的原子性，任一步驟失敗則全部 Rollback。
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+              <th>關鍵邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>createOrder()</td>
+              <td>建立訂單</td>
+              <td>驗庫存 → 扣庫存 → 快照價格 → 儲存</td>
+            </tr>
+            <tr>
+              <td>getAllOrders()</td>
+              <td>列出所有</td>
+              <td>按時間降序</td>
+            </tr>
+            <tr>
+              <td>getUserOrders()</td>
+              <td>用戶訂單</td>
+              <td>userId 篩選</td>
+            </tr>
+            <tr>
+              <td>getOrderById()</td>
+              <td>單一訂單</td>
+              <td>含 OrderItems 關聯載入</td>
+            </tr>
+            <tr>
+              <td>updateOrderStatus()</td>
+              <td>更新狀態</td>
+              <td>狀態機：PENDING → PAID → SHIPPED → COMPLETED</td>
+            </tr>
+            <tr>
+              <td>updatePaymentNote()</td>
+              <td>付款備註</td>
+              <td>銀行轉帳後 5 碼登記</td>
+            </tr>
+            <tr>
+              <td>hasActiveOrders()</td>
+              <td>檢查活躍訂單</td>
+              <td>帳號刪除前檢查</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.3 ProductService</h3>
+        <p><strong>職責</strong>：商品與規格管理。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+              <th>關鍵邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllListedProducts()</td>
+              <td>已上架商品</td>
+              <td>isListed=true 篩選</td>
+            </tr>
+            <tr>
+              <td>getProductsByCategory()</td>
+              <td>分類篩選</td>
+              <td>categoryId + isListed</td>
+            </tr>
+            <tr>
+              <td>searchProducts()</td>
+              <td>關鍵字搜尋</td>
+              <td>JPQL：名稱、描述、分類名稱模糊搜尋</td>
+            </tr>
+            <tr>
+              <td>createProduct()</td>
+              <td>新增商品</td>
+              <td>設置初始值、關聯分類</td>
+            </tr>
+            <tr>
+              <td>updateProduct()</td>
+              <td>更新商品</td>
+              <td>選擇性更新</td>
+            </tr>
+            <tr>
+              <td>toggleFeatured()</td>
+              <td>精選切換</td>
+              <td>上限 8 件檢查</td>
+            </tr>
+            <tr>
+              <td>createProductVariant()</td>
+              <td>新增規格</td>
+              <td>SKU 自動生成</td>
+            </tr>
+            <tr>
+              <td>generateUniqueSku()</td>
+              <td>生成 SKU</td>
+              <td>格式：{NAME_ABBR}-{COLOR}-{SIZE}-{RANDOM}</td>
+            </tr>
+            <tr>
+              <td>updateStock()</td>
+              <td>更新庫存</td>
+              <td>直接更新</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.4 CartService</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+              <th>關鍵邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getUserCart()</td>
+              <td>取得購物車</td>
+              <td>userId 查詢</td>
+            </tr>
+            <tr>
+              <td>getCartItem()</td>
+              <td>單一項目</td>
+              <td>cartItemId 查詢</td>
+            </tr>
+            <tr>
+              <td>addToCart()</td>
+              <td>加入商品</td>
+              <td>已存在則合併數量、驗庫存</td>
+            </tr>
+            <tr>
+              <td>updateQuantity()</td>
+              <td>更新數量</td>
+              <td>驗所有權、驗庫存</td>
+            </tr>
+            <tr>
+              <td>removeFromCart()</td>
+              <td>移除項目</td>
+              <td>驗所有權</td>
+            </tr>
+            <tr>
+              <td>clearCart()</td>
+              <td>清空購物車</td>
+              <td>批次刪除</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.5 CategoryService</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllCategories()</td>
+              <td>列出所有分類</td>
+            </tr>
+            <tr>
+              <td>getCategoryById()</td>
+              <td>單一分類</td>
+            </tr>
+            <tr>
+              <td>createCategory()</td>
+              <td>新增分類</td>
+            </tr>
+            <tr>
+              <td>updateCategory()</td>
+              <td>更新分類（選擇性更新）</td>
+            </tr>
+            <tr>
+              <td>deleteCategory()</td>
+              <td>刪除分類（存在性檢查）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.6 ContactMessageService</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>getAllMessages()</td>
+              <td>列出所有留言（按時間降序）</td>
+            </tr>
+            <tr>
+              <td>getMessagesByStatus()</td>
+              <td>狀態篩選</td>
+            </tr>
+            <tr>
+              <td>getMessageById()</td>
+              <td>單一留言</td>
+            </tr>
+            <tr>
+              <td>createMessage()</td>
+              <td>建立留言（含 IP、用戶關聯）</td>
+            </tr>
+            <tr>
+              <td>markAsRead()</td>
+              <td>標記已讀</td>
+            </tr>
+            <tr>
+              <td>markAsReplied()</td>
+              <td>標記已回覆（記錄時間）</td>
+            </tr>
+            <tr>
+              <td>deleteMessage()</td>
+              <td>刪除留言</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.7 ImageUploadService</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>說明</th>
+              <th>關鍵邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>uploadImage()</td>
+              <td>上傳圖片</td>
+              <td>驗類型 → 驗大小 → Cloudinary SDK → 回傳 URL</td>
+            </tr>
+            <tr>
+              <td>isAllowedImageType()</td>
+              <td>類型檢查</td>
+              <td>允許：jpg/png/gif/webp</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ========== SECTION 10: REPOSITORY 方法詳解 ========== -->
+        <hr />
+        <h2 id="sec-repository-detail">10. Repository 方法詳解</h2>
+        <p>
+          Repository 層繼承 <code>JpaRepository</code>，提供 CRUD
+          基礎方法，以下列出自訂查詢方法。
+        </p>
+
+        <h3>10.1 ProductRepository</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>實作原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>findByIsListedTrue()</code></td>
+              <td>前台只顯示已上架商品</td>
+            </tr>
+            <tr>
+              <td><code>findByCategoryCategoryIdAndIsListedTrue()</code></td>
+              <td>分類篩選 + 僅上架</td>
+            </tr>
+            <tr>
+              <td><code>searchProducts(keyword)</code></td>
+              <td>JPQL 多欄位模糊搜尋</td>
+            </tr>
+            <tr>
+              <td>
+                <code
+                  >findByIsFeaturedTrueAndIsListedTrueOrderByCreatedAtDesc()</code
+                >
+              </td>
+              <td>精選商品列表</td>
+            </tr>
+            <tr>
+              <td><code>countByIsFeaturedTrue()</code></td>
+              <td>精選上限 8 件檢查</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>searchProducts JPQL</h4>
+        <pre><code class="language-sql">@Query("SELECT p FROM Product p WHERE p.isListed = true AND " +
+       "(LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+       "LOWER(p.category.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")</code></pre>
+
+        <h3>10.2 OrderRepository</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>實作原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>findByUserUserId()</code></td>
+              <td>用戶訂單查詢</td>
+            </tr>
+            <tr>
+              <td><code>findByUserUserIdAndStatus()</code></td>
+              <td>用戶 + 狀態篩選</td>
+            </tr>
+            <tr>
+              <td><code>findAllByOrderByCreatedAtDesc()</code></td>
+              <td>Admin 訂單列表排序</td>
+            </tr>
+            <tr>
+              <td><code>findByStatus()</code></td>
+              <td>狀態篩選</td>
+            </tr>
+            <tr>
+              <td><code>existsByUserUserIdAndStatusIn()</code></td>
+              <td>帳號刪除前檢查活躍訂單</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>10.3 其他 Repository</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Repository</th>
+              <th>自訂方法</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CartItemRepository</td>
+              <td>
+                findByUserUserId()、findByUserUserIdAndVariantVariantId()、deleteByUserUserId()
+              </td>
+              <td>購物車操作</td>
+            </tr>
+            <tr>
+              <td>ProductVariantRepository</td>
+              <td>
+                findByProductProductId()、findBySkuCode()、findByProductProductIdAndColorIgnoreCaseAndSizeIgnoreCase()
+              </td>
+              <td>規格查詢</td>
+            </tr>
+            <tr>
+              <td>UserRepository</td>
+              <td>
+                findByEmail()、findByEmailAndIsDeletedFalse()、existsByEmail()
+              </td>
+              <td>用戶查詢</td>
+            </tr>
+            <tr>
+              <td>ContactMessageRepository</td>
+              <td>
+                findAllByOrderByCreatedAtDesc()、findByStatus()、findByUserUserId()
+              </td>
+              <td>留言查詢</td>
+            </tr>
+            <tr>
+              <td>CategoryRepository</td>
+              <td>（無自訂，使用 JpaRepository 預設）</td>
+              <td>分類 CRUD</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ========== SECTION 11: MODEL 設計詳解 ========== -->
+        <hr />
+        <h2 id="sec-model-detail">11. Model 設計詳解</h2>
+        <p>
+          Model 層採用 JPA + Lombok，以下說明 POJO 設計原因與 Annotation 使用。
+        </p>
+
+        <h3>11.1 User 實體</h3>
+        <pre><code class="language-java">@Entity
+@Table(name = "users")
+@Data @NoArgsConstructor @AllArgsConstructor
+public class User { ... }</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>欄位</th>
+              <th>型別</th>
+              <th>設計原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>userId</td>
+              <td>Long</td>
+              <td>自動遞增主鍵，避免 UUID 效能問題</td>
+            </tr>
+            <tr>
+              <td>email</td>
+              <td>String(100)</td>
+              <td>登入識別符，unique 約束防重複</td>
+            </tr>
+            <tr>
+              <td>password</td>
+              <td>String(255)</td>
+              <td>儲存 BCrypt 雜湊值（60 字元），預留空間</td>
+            </tr>
+            <tr>
+              <td>role</td>
+              <td>Enum</td>
+              <td>MEMBER/ADMIN，型別安全替代 Magic String</td>
+            </tr>
+            <tr>
+              <td>isDeleted</td>
+              <td>Boolean</td>
+              <td>軟刪除標記，保留歷史訂單關聯</td>
+            </tr>
+            <tr>
+              <td>deletedAt</td>
+              <td>LocalDateTime</td>
+              <td>刪除時間戳記，用於 audit trail</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>@Enumerated(EnumType.STRING)</strong>：Enum
+          存為字串（"MEMBER"/"ADMIN"）而非數字，可讀性高且防止順序改變造成資料錯亂。
+        </p>
+
+        <h3>11.2 Product 實體</h3>
+        <pre><code class="language-java">@Entity
+@Table(name = "products", indexes = {
+    @Index(name = "idx_category_listed", columnList = "category_id, is_listed"),
+    @Index(name = "idx_name", columnList = "name"),
+    @Index(name = "idx_created_at", columnList = "created_at")
+})</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>索引</th>
+              <th>設計原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>idx_category_listed</td>
+              <td>優化分類篩選 + 上架狀態查詢</td>
+            </tr>
+            <tr>
+              <td>idx_name</td>
+              <td>優化商品名稱搜尋</td>
+            </tr>
+            <tr>
+              <td>idx_created_at</td>
+              <td>優化時間排序</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>orphanRemoval = true</strong>：當 Product 刪除時，連帶刪除所有
+          ProductVariant。
+        </p>
+
+        <h3>11.3 Order 實體</h3>
+        <pre><code class="language-java">public enum OrderStatus {
+    PENDING, PAID, SHIPPED, COMPLETED, CANCELLED
+}</code></pre>
+        <p>
+          <strong>狀態機設計</strong>：PENDING → PAID → SHIPPED → COMPLETED /
+          CANCELLED
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>欄位</th>
+              <th>設計原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>totalAmount</td>
+              <td>訂單總金額快照，不受商品價格變動影響</td>
+            </tr>
+            <tr>
+              <td>paymentNote</td>
+              <td>銀行轉帳後 5 碼，供人工核對</td>
+            </tr>
+            <tr>
+              <td>recipientName/Phone/Address</td>
+              <td>收件人資訊，與用戶資料分離（可代收）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>11.4 其他實體設計要點</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>實體</th>
+              <th>設計要點</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ProductVariant</td>
+              <td>UniqueConstraint(product_id, color, size) 防止重複規格</td>
+            </tr>
+            <tr>
+              <td>CartItem</td>
+              <td>UniqueConstraint(user_id, variant_id) 防止同規格重複加入</td>
+            </tr>
+            <tr>
+              <td>OrderItem</td>
+              <td>price 欄位為下單時價格快照</td>
+            </tr>
+            <tr>
+              <td>ContactMessage</td>
+              <td>ipAddress 欄位記錄 IPv4/IPv6（長度 45）</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>@PrePersist</strong>：所有實體在 INSERT 前自動填入
+          <code>createdAt</code>，確保 audit 一致性。
+        </p>
+
+        <!-- ========== SECTION 12: DTO 轉換詳解 ========== -->
+        <hr />
+        <h2 id="sec-dto-detail">12. DTO 轉換詳解</h2>
+        <p>
+          DTO 層負責前後端命名解耦與資料過濾，所有 DTO 都有
+          <code>fromEntity()</code> 和 <code>fromEntities()</code> 靜態方法。
+        </p>
+
+        <h3>12.1 ProductDTO</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>後端欄位</th>
+              <th>前端欄位</th>
+              <th>轉換邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>productId</td>
+              <td>id</td>
+              <td>命名規範統一</td>
+            </tr>
+            <tr>
+              <td>imageUrl</td>
+              <td>image</td>
+              <td>命名規範統一</td>
+            </tr>
+            <tr>
+              <td>category.name</td>
+              <td>category</td>
+              <td>展開關聯為字串</td>
+            </tr>
+            <tr>
+              <td>category.categoryId</td>
+              <td>categoryId</td>
+              <td>保留 ID 供篩選</td>
+            </tr>
+            <tr>
+              <td>variants.stock.sum()</td>
+              <td>stock</td>
+              <td>聚合所有規格庫存</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>12.2 OrderDTO</h3>
+        <p>
+          含巢狀 <code>OrderItemDTO</code>，計算每項小計
+          <code>subtotal = price × quantity</code>。
+        </p>
+
+        <h3>12.3 CartItemDTO</h3>
+        <p>
+          三層巢狀結構：CartItemDTO → VariantInfo →
+          ProductInfo，提供完整購物車資訊。
+        </p>
+
+        <!-- ========== SECTION 13: CONFIG 配置詳解 ========== -->
+        <hr />
+        <h2 id="sec-config-detail">13. Config 配置詳解</h2>
+
+        <h3>13.1 SecurityConfig</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Bean/設定</th>
+              <th>實作原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>corsConfigurationSource()</td>
+              <td>CORS 白名單，支援 Cookie 跨域</td>
+            </tr>
+            <tr>
+              <td>securityFilterChain()</td>
+              <td>路由權限配置 + JWT Filter 註冊</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>公開路由</strong>：<code>/api/auth/**</code>、GET
+          <code>/api/products/**</code>、GET
+          <code>/api/categories/**</code>、POST <code>/api/inquiries</code>
+        </p>
+
+        <h3>13.2 DataInitializer</h3>
+        <p>
+          實作 <code>CommandLineRunner</code>，啟動時自動建立預設
+          Admin（admin@choose.com / 123456）。
+        </p>
+
+        <h3>13.3 PasswordConfig</h3>
+        <p>
+          獨立配置類別，避免 SecurityConfig 循環依賴。提供
+          <code>BCryptPasswordEncoder</code> Bean。
+        </p>
+
+        <h3>13.4 CloudinaryConfig</h3>
+        <p>
+          從環境變數讀取 <code>CLOUDINARY_*</code> 配置，初始化 Cloudinary SDK。
+        </p>
+
+        <h3>13.5 WebConfig</h3>
+        <p>目前空實作，CORS 已移至 SecurityConfig（避免重複標頭）。</p>
+
+        <!-- ========== SECTION 14: SECURITY 安全詳解 ========== -->
+        <hr />
+        <h2 id="sec-security-detail">14. Security 安全詳解</h2>
+
+        <h3>14.1 JwtUtil</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>實作原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>generateToken()</td>
+              <td>產生 JWT，包含 userId/email/role</td>
+            </tr>
+            <tr>
+              <td>extractEmail()</td>
+              <td>從 Token 提取 email（subject）</td>
+            </tr>
+            <tr>
+              <td>extractUserId()</td>
+              <td>從 Token 提取 userId（custom claim）</td>
+            </tr>
+            <tr>
+              <td>extractRole()</td>
+              <td>從 Token 提取 role（custom claim）</td>
+            </tr>
+            <tr>
+              <td>validateToken()</td>
+              <td>驗證簽章 + 過期時間</td>
+            </tr>
+            <tr>
+              <td>isTokenExpired()</td>
+              <td>檢查是否過期</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>HMAC-SHA256 簽章</strong>：使用
+          <code>Keys.hmacShaKeyFor()</code> 產生簽章金鑰。
+        </p>
+
+        <h3>14.2 JwtAuthenticationFilter</h3>
+        <p>繼承 <code>OncePerRequestFilter</code>，每個請求執行一次。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>實作原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>doFilterInternal()</td>
+              <td>主要過濾邏輯</td>
+            </tr>
+            <tr>
+              <td>extractJwtFromCookie()</td>
+              <td>優先從 Cookie 取得 Token</td>
+            </tr>
+            <tr>
+              <td>extractJwtFromHeader()</td>
+              <td>回退至 Authorization Header（相容性）</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>認證流程</strong>：提取 Token → 驗證 → 查詢用戶 → 建立
+          Authentication → 注入 SecurityContext。
+        </p>
+
+        <!-- ========== SECTION 15: COMMON 共用詳解 ========== -->
+        <hr />
+        <h2 id="sec-common-detail">15. Common 共用詳解</h2>
+
+        <h3>15.1 ApiResponse&lt;T&gt;</h3>
+        <pre><code class="language-java">public class ApiResponse&lt;T&gt; {
+    private boolean success;
+    private String message;
+    private T data;
+}</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>success(data)</td>
+              <td>標準成功回應</td>
+            </tr>
+            <tr>
+              <td>success(msg, data)</td>
+              <td>含訊息的成功回應</td>
+            </tr>
+            <tr>
+              <td>error(msg)</td>
+              <td>標準錯誤回應</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>15.2 GlobalExceptionHandler</h3>
+        <pre><code class="language-java">@RestControllerAdvice
+public class GlobalExceptionHandler { ... }</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>例外類型</th>
+              <th>HTTP Status</th>
+              <th>場景</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MethodArgumentNotValidException</td>
+              <td>400</td>
+              <td>Bean Validation 失敗</td>
+            </tr>
+            <tr>
+              <td>IllegalArgumentException</td>
+              <td>400</td>
+              <td>業務邏輯驗證失敗</td>
+            </tr>
+            <tr>
+              <td>EntityNotFoundException</td>
+              <td>404</td>
+              <td>資源不存在</td>
+            </tr>
+            <tr>
+              <td>AccessDeniedException</td>
+              <td>403</td>
+              <td>權限不足</td>
+            </tr>
+            <tr>
+              <td>BadCredentialsException</td>
+              <td>401</td>
+              <td>登入失敗</td>
+            </tr>
+            <tr>
+              <td>NoHandlerFoundException</td>
+              <td>404</td>
+              <td>路由不存在</td>
+            </tr>
+            <tr>
+              <td>RuntimeException</td>
+              <td>500</td>
+              <td>系統錯誤</td>
+            </tr>
+            <tr>
+              <td>Exception</td>
+              <td>500</td>
+              <td>兜底處理</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ========== SECTION 16: 層級協作關係圖 ========== -->
+        <hr />
+        <h2 id="sec-collaboration">16. 層級協作關係圖</h2>
+        <div class="diagram-box">
+          <div class="diagram-title">Layer Collaboration</div>
+          <div class="mermaid" id="diagram-collaboration"></div>
+        </div>
+        <p><strong>協作說明</strong>：</p>
+        <ul>
+          <li><strong>Controller → Service</strong>：調用業務邏輯</li>
+          <li><strong>Service → Repository</strong>：資料存取</li>
+          <li><strong>Repository → Model</strong>：ORM 映射</li>
+          <li><strong>Controller/Service → DTO</strong>：資料轉換</li>
+          <li>
+            <strong>Security → Service</strong>：用戶驗證需查詢 UserService
+          </li>
+          <li>
+            <strong>Config → Security</strong>：SecurityConfig 註冊
+            JwtAuthenticationFilter
+          </li>
+          <li>
+            <strong>Common → Controller</strong>：ApiResponse +
+            GlobalExceptionHandler
+          </li>
+        </ul>
+      </article>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button
+      class="back-to-top"
+      id="backToTop"
+      onclick="scrollToTop()"
+      title="回到頂部"
+    >
+      ↑
+    </button>
+
+    <!-- DIAGRAM TEMPLATES -->
+    <script type="text/template" id="tpl-layered">
+      flowchart TB
+          subgraph Client
+              Browser[Vue 3 Frontend]
+          end
+          subgraph Security["Security Layer (2)"]
+              Filter[JwtAuthenticationFilter]
+              Util[JwtUtil]
+          end
+          subgraph Presentation["Controller Layer (9)"]
+              C[REST Controllers]
+          end
+          subgraph Business["Service Layer (7)"]
+              S[Business Services]
+          end
+          subgraph Persistence["Repository Layer (7)"]
+              R[JpaRepository]
+          end
+          subgraph Database["Database"]
+              DB[(MySQL)]
+          end
+          Browser -- "HTTP + JWT Cookie" --> Filter
+          Filter -- "解析 Token" --> Util
+          Util -- "驗證簽章" --> Filter
+          Filter -- "注入 SecurityContext" --> C
+          C -- "@Valid 驗證" --> C
+          C -- "調用業務" --> S
+          S -- "@Transactional" --> S
+          S -- "Entity 操作" --> R
+          R --> DB
+    </script>
+
+    <script type="text/template" id="tpl-auth">
+      sequenceDiagram
+          participant B as Browser
+          participant F as JwtFilter
+          participant U as JwtUtil
+          participant S as UserService
+          participant C as Controller
+          B->>F: HTTP Request (Cookie: auth_token)
+          F->>F: 從 Cookie / Header 提取 Token
+          F->>U: validateToken(token)
+          U-->>F: Claims (userId, email, role)
+          F->>S: findByEmail(email)
+          S-->>F: User Entity
+          F->>F: 建立 Authentication
+          F->>F: SecurityContextHolder.setContext()
+          F->>C: 放行請求
+          C->>C: @AuthenticationPrincipal User
+          C-->>B: ApiResponse JSON
+    </script>
+
+    <script type="text/template" id="tpl-order">
+      sequenceDiagram
+          autonumber
+          participant FE as Frontend
+          participant C as OrderController
+          participant S as OrderService
+          participant R as Repository
+          participant DB as MySQL
+          FE->>C: POST /api/orders
+          C->>S: createOrder(userId, Order)
+          activate S
+          Note over S: @Transactional 開啟交易
+          loop 每項 OrderItem
+              S->>R: findVariantById(id)
+              R->>DB: SELECT * FROM product_variants
+              DB-->>R: Variant (含 stock)
+              S->>S: 驗證 stock >= quantity
+              alt 庫存不足
+                  S-->>C: throw IllegalArgumentException
+                  Note over S: 自動 Rollback
+              end
+              S->>R: variant.setStock(stock - qty)
+              R->>DB: UPDATE product_variants
+          end
+          S->>R: save(Order + OrderItems)
+          R->>DB: INSERT INTO orders, order_items
+          deactivate S
+          S-->>C: 成功回傳 Order
+          C->>C: 轉換為 OrderDTO
+          C-->>FE: 201 Created
+    </script>
+
+    <script type="text/template" id="tpl-collaboration">
+      flowchart LR
+          subgraph Presentation
+              C[Controller]
+          end
+          subgraph Business
+              S[Service]
+          end
+          subgraph Persistence
+              R[Repository]
+          end
+          subgraph Domain
+              M[Model]
+          end
+          subgraph CrossCutting["Cross-Cutting Concerns"]
+              DTO[DTO]
+              SEC[Security]
+              CFG[Config]
+              COM[Common]
+          end
+          C --> S
+          S --> R
+          R --> M
+          C --> DTO
+          S --> DTO
+          SEC --> S
+          CFG --> SEC
+          COM --> C
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.4.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "default",
+        securityLevel: "loose",
+      });
+      async function startRendering() {
+        setTimeout(hideLoading, 4000);
+        try {
+          hljs.highlightAll();
+          const diagrams = [
+            { tpl: "tpl-layered", target: "diagram-layered" },
+            { tpl: "tpl-auth", target: "diagram-auth" },
+            { tpl: "tpl-order", target: "diagram-order" },
+            { tpl: "tpl-collaboration", target: "diagram-collaboration" },
+          ];
+          for (const item of diagrams) {
+            const source = document.getElementById(item.tpl).innerHTML.trim();
+            document.getElementById(item.target).textContent = source;
+          }
+          await mermaid.run({ nodes: document.querySelectorAll(".mermaid") });
+          hideLoading();
+        } catch (err) {
+          console.error("Render error:", err);
+          hideLoading();
+        }
+      }
+      function hideLoading() {
+        const loader = document.getElementById("loading");
+        if (loader) {
+          loader.style.opacity = "0";
+          setTimeout(() => (loader.style.display = "none"), 500);
+        }
+      }
+      window.onload = startRendering;
+
+      // Back to Top functionality
+      const backToTopBtn = document.getElementById("backToTop");
+      window.addEventListener("scroll", function () {
+        if (window.scrollY > 500) {
+          backToTopBtn.classList.add("visible");
+        } else {
+          backToTopBtn.classList.remove("visible");
+        }
+      });
+      function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    </script>
+  </body>
+</html>

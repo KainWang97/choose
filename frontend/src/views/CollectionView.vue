@@ -2,7 +2,7 @@
 /**
  * CollectionView - 商品列表頁
  */
-import { inject, computed, watch } from "vue";
+import { inject, computed, ref, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CollectionSection from "../components/CollectionSection.vue";
 
@@ -23,6 +23,25 @@ const searchQuery = computed(() => route.query.search || "");
 const clearSearch = () => {
   router.push("/collection");
 };
+
+// Back to Top 功能
+const showBackToTop = ref(false);
+
+const handleScroll = () => {
+  showBackToTop.value = window.scrollY > 300;
+};
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
@@ -50,5 +69,42 @@ const clearSearch = () => {
       :searchQuery="searchQuery"
       @product-click="handleProductClick"
     />
+
+    <!-- Back to Top 按鈕 -->
+    <Transition name="fade">
+      <button
+        v-show="showBackToTop"
+        @click="scrollToTop"
+        class="fixed bottom-8 right-8 z-50 w-12 h-12 bg-sumi/80 hover:bg-sumi text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+        aria-label="回到頂部"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 10l7-7m0 0l7 7m-7-7v18"
+          />
+        </svg>
+      </button>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
