@@ -121,7 +121,6 @@ CREATE TABLE contact_messages (
 );
 
 INSERT INTO users (email, password, name, phone, role, created_at) VALUES
-('admin@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '管理員', '0912345678', 'ADMIN', NOW()),
 ('kevin.lin@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '林凱文', '0923456789', 'MEMBER', DATE_SUB(NOW(), INTERVAL 30 DAY)),
 ('amy.chen@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '陳怡君', '0934567890', 'MEMBER', DATE_SUB(NOW(), INTERVAL 20 DAY)),
 ('david.huang@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '黃大維', '0945678901', 'MEMBER', DATE_SUB(NOW(), INTERVAL 10 DAY)),

@@ -103,7 +103,7 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
     >
       <button
         @click="emit('home')"
-        class="text-sm tracking-[0.2em] font-serif text-sumi hover:opacity-70 transition-opacity uppercase cursor-pointer"
+        class="md:px-10 md:text-xl text-sm tracking-[0.2em] font-serif text-sumi hover:opacity-70 transition-opacity uppercase cursor-pointer"
       >
         Choose
       </button>
