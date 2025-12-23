@@ -591,18 +591,53 @@ const monthlySales = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-stone-100 pt-32 pb-24 px-6 animate-fade-in">
+  <div class="bg-stone-100 pt-2 pb-5 px-5 md:px-35 animate-fade-in">
     <div class="max-w-7xl mx-auto">
-      <div class="flex justify-between items-end mb-12">
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6 md:mb-12"
+      >
         <div>
-          <h1 class="text-3xl font-serif text-sumi mb-2">Admin Dashboard</h1>
+          <h1 class="text-2xl md:text-3xl font-serif text-sumi mb-1">
+            Admin Dashboard
+          </h1>
           <p class="text-xs uppercase tracking-widest text-stone-500">
             Store Management System
           </p>
         </div>
-        <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+
+        <!-- 手機版：下拉選單 -->
+        <div class="w-full md:hidden">
+          <select
+            v-model="activeTab"
+            class="w-full px-4 py-3 bg-white border border-stone-200 text-sm uppercase tracking-widest text-sumi focus:outline-none focus:border-sumi rounded-sm"
+          >
+            <option
+              v-for="tab in [
+                'INVENTORY',
+                'CATEGORIES',
+                'ORDERS',
+                'MEMBERS',
+                'STATS',
+                'INQUIRIES',
+              ]"
+              :key="tab"
+              :value="tab"
+            >
+              {{ tab }}
+              <template v-if="tab === 'INQUIRIES' && unreadInquiriesCount > 0">
+                ({{ unreadInquiriesCount }})
+              </template>
+              <template v-if="tab === 'ORDERS' && pendingOrdersCount > 0">
+                ({{ pendingOrdersCount }})
+              </template>
+            </option>
+          </select>
+        </div>
+
+        <!-- 桌機版：Tab 按鈕 -->
+        <div class="hidden md:block">
           <div
-            class="flex gap-1 bg-white p-1 rounded-sm border border-stone-200 min-w-max"
+            class="flex gap-1 bg-white p-1 rounded-sm border border-stone-200"
           >
             <button
               v-for="tab in [
@@ -615,7 +650,7 @@ const monthlySales = computed(() => {
               ]"
               :key="tab"
               @click="activeTab = tab"
-              class="px-3 md:px-6 py-2 text-xs uppercase tracking-widest transition-all relative whitespace-nowrap"
+              class="px-6 py-2 text-xs uppercase tracking-widest transition-all relative whitespace-nowrap"
               :class="
                 activeTab === tab
                   ? 'bg-sumi text-washi'
