@@ -591,11 +591,11 @@ const monthlySales = computed(() => {
 </script>
 
 <template>
-  <div class="bg-stone-100 pt-2 pb-5 px-5 md:px-35 animate-fade-in">
+  <div
+    class="min-h-screen bg-stone-100 pt-24 pb-12 px-4 md:px-8 animate-fade-in"
+  >
     <div class="max-w-7xl mx-auto">
-      <div
-        class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6 md:mb-12"
-      >
+      <div class="flex justify-between gap-4 mb-6 md:mb-8">
         <div>
           <h1 class="text-2xl md:text-3xl font-serif text-sumi mb-1">
             Admin Dashboard
@@ -605,11 +605,11 @@ const monthlySales = computed(() => {
           </p>
         </div>
 
-        <!-- 手機版：下拉選單 -->
-        <div class="w-full md:hidden">
+        <!-- 手機/平板版：下拉選單 -->
+        <div class="w-full lg:hidden">
           <select
             v-model="activeTab"
-            class="w-full px-4 py-3 bg-white border border-stone-200 text-sm uppercase tracking-widest text-sumi focus:outline-none focus:border-sumi rounded-sm"
+            class="w-full px-4 py-3 bg-white border border-stone-200 text-sm uppercase tracking-widest text-sumi focus:outline-none focus:border-sumi rounded-sm text-center"
           >
             <option
               v-for="tab in [
@@ -635,7 +635,7 @@ const monthlySales = computed(() => {
         </div>
 
         <!-- 桌機版：Tab 按鈕 -->
-        <div class="hidden md:block">
+        <div class="hidden lg:block">
           <div
             class="flex gap-1 bg-white p-1 rounded-sm border border-stone-200"
           >
