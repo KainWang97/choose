@@ -122,10 +122,10 @@ CREATE TABLE contact_messages (
 
 INSERT INTO users (email, password, name, phone, role, created_at) VALUES
 ('admin@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '管理員', '0912345678', 'ADMIN', NOW()),
-('user1@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '張三', '0923456789', 'MEMBER', DATE_SUB(NOW(), INTERVAL 30 DAY)),
-('user2@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '李四', '0934567890', 'MEMBER', DATE_SUB(NOW(), INTERVAL 20 DAY)),
-('user3@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '王五', '0945678901', 'MEMBER', DATE_SUB(NOW(), INTERVAL 10 DAY)),
-('user4@example.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '趙六', '0956789012', 'MEMBER', DATE_SUB(NOW(), INTERVAL 5 DAY));
+('kevin.lin@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '林凱文', '0923456789', 'MEMBER', DATE_SUB(NOW(), INTERVAL 30 DAY)),
+('amy.chen@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '陳怡君', '0934567890', 'MEMBER', DATE_SUB(NOW(), INTERVAL 20 DAY)),
+('david.huang@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '黃大維', '0945678901', 'MEMBER', DATE_SUB(NOW(), INTERVAL 10 DAY)),
+('jenny.wu@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '吳佳穎', '0956789012', 'MEMBER', DATE_SUB(NOW(), INTERVAL 5 DAY));
 
 INSERT INTO categories (name, description, created_at) VALUES
 ('Top', '上衣、T恤、襯衫、針織衫、毛衣', DATE_SUB(NOW(), INTERVAL 60 DAY)),
@@ -192,13 +192,13 @@ INSERT INTO cart_items (user_id, variant_id, quantity, created_at) VALUES
 (4, 31, 1, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 INSERT INTO orders (user_id, total_amount, status, payment_method, payment_note, shipping_method, recipient_name, recipient_phone, shipping_address, created_at) VALUES
-(2, 2560.00, 'PAID', 'BANK_TRANSFER', '已轉帳，後五碼：12345', 'MAIL', '張三', '0923456789', '台北市信義區信義路五段7號', DATE_SUB(NOW(), INTERVAL 15 DAY)),
-(2, 1280.00, 'SHIPPED', 'BANK_TRANSFER', NULL, 'STORE', '張三', '0923456789', '7-11 信義門市', DATE_SUB(NOW(), INTERVAL 10 DAY)),
-(2, 580.00, 'COMPLETED', 'BANK_TRANSFER', NULL, 'MAIL', '張三', '0923456789', '台北市大安區敦化南路二段216號', DATE_SUB(NOW(), INTERVAL 5 DAY)),
-(3, 2540.00, 'PENDING', 'BANK_TRANSFER', NULL, 'MAIL', '李四', '0934567890', '新北市板橋區文化路一段188巷', DATE_SUB(NOW(), INTERVAL 1 DAY)),
-(3, 980.00, 'COMPLETED', 'BANK_TRANSFER', '已轉帳', 'STORE', '李四', '0934567890', '全家 板橋門市', DATE_SUB(NOW(), INTERVAL 8 DAY)),
-(4, 2560.00, 'PAID', 'BANK_TRANSFER', '已轉帳，後五碼：67890', 'MAIL', '王五', '0945678901', '台中市西屯區台灣大道三段99號', DATE_SUB(NOW(), INTERVAL 12 DAY)),
-(4, 1880.00, 'SHIPPED', 'BANK_TRANSFER', NULL, 'STORE', '王五', '0945678901', 'OK超商 西屯門市', DATE_SUB(NOW(), INTERVAL 7 DAY));
+(2, 2560.00, 'PAID', 'BANK_TRANSFER', '已轉帳，後五碼：12345', 'MAIL', '林凱文', '0923456789', '台北市信義區信義路五段7號', DATE_SUB(NOW(), INTERVAL 15 DAY)),
+(2, 1280.00, 'SHIPPED', 'BANK_TRANSFER', NULL, 'STORE', '林凱文', '0923456789', '7-11 信義門市', DATE_SUB(NOW(), INTERVAL 10 DAY)),
+(2, 580.00, 'COMPLETED', 'BANK_TRANSFER', NULL, 'MAIL', '林凱文', '0923456789', '台北市大安區敦化南路二段216號', DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(3, 2540.00, 'PENDING', 'BANK_TRANSFER', NULL, 'MAIL', '陳怡君', '0934567890', '新北市板橋區文化路一段188巷', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(3, 980.00, 'COMPLETED', 'BANK_TRANSFER', '已轉帳', 'STORE', '陳怡君', '0934567890', '全家 板橋門市', DATE_SUB(NOW(), INTERVAL 8 DAY)),
+(4, 2560.00, 'PAID', 'BANK_TRANSFER', '已轉帳，後五碼：67890', 'MAIL', '黃大維', '0945678901', '台中市西屯區台灣大道三段99號', DATE_SUB(NOW(), INTERVAL 12 DAY)),
+(4, 1880.00, 'SHIPPED', 'BANK_TRANSFER', NULL, 'STORE', '黃大維', '0945678901', 'OK超商 西屯門市', DATE_SUB(NOW(), INTERVAL 7 DAY));
 
 INSERT INTO order_items (order_id, variant_id, price, quantity) VALUES
 (1, 5, 1280.00, 1), (1, 13, 1280.00, 1),
@@ -210,12 +210,12 @@ INSERT INTO order_items (order_id, variant_id, price, quantity) VALUES
 (7, 29, 1880.00, 1);
 
 INSERT INTO contact_messages (user_id, name, email, message, status, ip_address, created_at, replied_at) VALUES
-(2, '張三', 'user1@example.com', '請問商品何時會到貨？', 'REPLIED', '192.168.1.100', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 19 DAY)),
-(3, '李四', 'user2@example.com', '可以退換貨嗎？', 'READ', '192.168.1.101', DATE_SUB(NOW(), INTERVAL 15 DAY), NULL),
-(4, '王五', 'user3@example.com', '商品品質很好，謝謝！', 'REPLIED', '192.168.1.102', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY)),
-(NULL, '陳七', 'guest1@example.com', '想詢問是否有其他顏色？', 'UNREAD', '192.168.1.103', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL),
-(NULL, '林八', 'guest2@example.com', '商品尺寸如何選擇？', 'READ', '192.168.1.104', DATE_SUB(NOW(), INTERVAL 3 DAY), NULL),
-(NULL, '黃九', 'guest3@example.com', '請問有實體店面嗎？', 'UNREAD', '192.168.1.105', DATE_SUB(NOW(), INTERVAL 1 DAY), NULL);
+(2, '林凱文', 'kevin.lin@choose.com', '請問商品何時會到貨？', 'REPLIED', '192.168.1.100', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 19 DAY)),
+(3, '陳怡君', 'amy.chen@choose.com', '可以退換貨嗎？', 'READ', '192.168.1.101', DATE_SUB(NOW(), INTERVAL 15 DAY), NULL),
+(4, '黃大維', 'david.huang@choose.com', '商品品質很好，謝謝！', 'REPLIED', '192.168.1.102', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY)),
+(NULL, '周雅婷', 'tina.chou@choose.com', '想詢問是否有其他顏色？', 'UNREAD', '192.168.1.103', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL),
+(NULL, '楊志明', 'ming.yang@choose.com', '商品尺寸如何選擇？', 'READ', '192.168.1.104', DATE_SUB(NOW(), INTERVAL 3 DAY), NULL),
+(NULL, '許雅雯', 'wendy.hsu@choose.com', '請問有實體店面嗎？', 'UNREAD', '192.168.1.105', DATE_SUB(NOW(), INTERVAL 1 DAY), NULL);
 
 SELECT 'users' AS table_name, COUNT(*) AS count FROM users
 UNION ALL SELECT 'categories', COUNT(*) FROM categories

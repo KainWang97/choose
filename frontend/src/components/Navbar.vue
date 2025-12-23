@@ -6,6 +6,7 @@ const props = defineProps({
   isScrolled: Boolean,
   user: Object,
   cartItems: Array,
+  isOnCollectionPage: Boolean,
 });
 
 const emit = defineEmits([
@@ -90,38 +91,42 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
 
 <template>
   <nav
-    class="fixed top-0 left-0 w-full z-50 transition-all duration-700 ease-in-out border-b"
+    class="fixed top-0 left-0 w-full z-50 transition-all duration-700 ease-in-out border-b overflow-hidden"
     :class="[
       isScrolled
         ? 'bg-washi/95 backdrop-blur-sm py-4 border-stone-200/100 shadow-sm'
         : 'bg-white/70 backdrop-blur-sm py-6 border-stone-200/50',
     ]"
   >
-    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <div
+      class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center"
+    >
       <button
         @click="emit('home')"
-        class="text-2xl tracking-[0.2em] font-serif text-sumi hover:opacity-70 transition-opacity uppercase cursor-pointer"
+        class="text-sm tracking-[0.2em] font-serif text-sumi hover:opacity-70 transition-opacity uppercase cursor-pointer"
       >
         Choose
       </button>
 
       <div
-        class="flex items-center gap-6 text-sm tracking-widest text-stone-600 font-light"
+        class="flex items-center gap-3 md:gap-6 text-sm tracking-widest text-stone-600 font-light"
       >
         <!-- Admin Link -->
         <button
           v-if="isAdmin"
           @click="emit('open-admin')"
           class="text-red-900 font-medium hover:text-red-700 transition-colors uppercase border-b border-red-900/20"
+          :class="{ hidden: isSearchOpen }"
         >
           Dashboard
         </button>
 
-        <!-- Collection (非管理員顯示) -->
+        <!-- Collection (非管理員顯示，且不在商品列表頁時) -->
         <button
-          v-if="!isAdmin"
+          v-if="!isAdmin && !isOnCollectionPage"
           @click="emit('collection')"
           class="hover:text-sumi transition-all duration-300 group relative"
+          :class="{ 'hidden sm:block': isSearchOpen }"
           title="Collection"
         >
           <!-- 大螢幕顯示文字 -->
@@ -159,7 +164,7 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
             @keydown.escape="toggleSearch"
             type="text"
             placeholder="搜尋商品..."
-            class="w-40 md:w-56 px-3 py-1.5 text-sm border border-stone-300 rounded-sm bg-white/80 focus:outline-none focus:border-stone-500 transition-all"
+            class="w-32 sm:w-40 md:w-56 px-3 py-1.5 text-sm border border-stone-300 rounded-sm bg-white/80 focus:outline-none focus:border-stone-500 transition-all"
           />
           <button
             @click="isSearchOpen ? handleSearch() : toggleSearch()"
@@ -184,6 +189,7 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
           v-if="!isAdmin"
           @click="emit('open-cart')"
           class="hover:text-sumi transition-colors flex items-center gap-1 group"
+          :class="{ 'hidden sm:flex': isSearchOpen }"
         >
           <svg
             class="w-6 h-6 stroke-current stroke-1 group-hover:stroke-2 transition-all"
@@ -208,6 +214,7 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
           v-if="!isAdmin"
           @click="user ? emit('open-account') : emit('open-auth')"
           class="hover:text-sumi transition-colors group relative"
+          :class="{ 'hidden sm:block': isSearchOpen }"
           :title="user ? 'My Account' : 'Login'"
         >
           <svg
@@ -234,7 +241,21 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
             v-if="isLoggingOut"
             class="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
           ></span>
-          {{ isLoggingOut ? "..." : "LOGOUT" }}
+          <span class="hidden sm:inline">{{
+            isLoggingOut ? "..." : "LOGOUT"
+          }}</span>
+          <svg
+            class="w-5 h-5 sm:hidden stroke-current"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
         </button>
       </div>
     </div>

@@ -312,7 +312,7 @@ const handleChangePassword = async () => {
             <div class="flex items-center gap-3">
               <!-- 配送方式（置頂） -->
               <span
-                class="px-3 py-1.5 text-sm font-medium rounded border"
+                class="px-3 py-1.5 text-sm font-medium border whitespace-nowrap"
                 :class="
                   order.shippingMethod === 'STORE_PICKUP' ||
                   order.shippingMethod === 'STORE'
@@ -327,13 +327,34 @@ const handleChangePassword = async () => {
                     : "郵局宅配"
                 }}
               </span>
-              <span class="font-medium text-lg text-sumi"
+              <span class="font-medium text-base md:text-lg text-sumi"
                 >訂單編號 #{{ order.id }}</span
               >
             </div>
-            <span class="text-sm text-stone-400">{{
+            <span class="text-xs md:text-sm text-stone-400">{{
               order.date || order.createdAt
             }}</span>
+          </div>
+
+          <!-- 配送資訊 -->
+          <div class="bg-stone-50 p-3 mb-4 text-sm text-stone-600 space-y-1">
+            <p>
+              <span class="text-stone-400">收件人：</span>
+              {{ order.recipientName }}
+            </p>
+            <p>
+              <span class="text-stone-400">電話：</span>
+              {{ order.recipientPhone }}
+            </p>
+            <p>
+              <span class="text-stone-400">{{
+                order.shippingMethod === "STORE_PICKUP" ||
+                order.shippingMethod === "STORE"
+                  ? "取貨門市："
+                  : "配送地址："
+              }}</span>
+              {{ order.shippingAddress }}
+            </p>
           </div>
 
           <!-- 商品明細 -->
@@ -359,12 +380,12 @@ const handleChangePassword = async () => {
 
           <!-- 底部：訂單進度 + 金額 -->
           <div
-            class="flex justify-between items-center pt-4 border-t border-stone-100"
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 border-t border-stone-100"
           >
             <div class="flex items-center gap-2">
               <span class="text-xs text-stone-500">訂單進度：</span>
               <span
-                class="text-sm px-2 py-1 font-medium rounded border border-stone-300 bg-stone-50 text-stone-700"
+                class="text-xs px-2 py-0.5 font-medium rounded border border-stone-300 bg-stone-50 text-stone-700"
               >
                 {{
                   order.status === "PENDING"
@@ -381,7 +402,7 @@ const handleChangePassword = async () => {
                 }}
               </span>
             </div>
-            <span class="font-serif text-lg text-sumi"
+            <span class="font-serif text-base md:text-lg text-sumi"
               >總金額：${{ order.total }}</span
             >
           </div>

@@ -772,6 +772,7 @@ const hideFooter = computed(() => route.path.startsWith("/admin"));
       :isScrolled="isScrolled"
       :user="user"
       :cartItems="cart"
+      :isOnCollectionPage="route.path === '/collection'"
       @open-auth="isAuthOpen = true"
       @open-cart="isCartOpen = true"
       @open-account="router.push('/account')"

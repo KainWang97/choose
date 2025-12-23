@@ -48,6 +48,22 @@ const pendingOrdersCount = computed(() => {
   ).length;
 });
 
+// ============================================
+// 日期時間格式化
+// ============================================
+const formatDateTime = (dateStr) => {
+  if (!dateStr) return "-";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 // 從產品的 isFeatured 屬性計算，確保與後端同步
 const computedFeaturedIds = computed(() => {
   if (!props.products) return [];
@@ -584,54 +600,60 @@ const monthlySales = computed(() => {
             Store Management System
           </p>
         </div>
-        <div class="flex gap-1 bg-white p-1 rounded-sm border border-stone-200">
-          <button
-            v-for="tab in [
-              'INVENTORY',
-              'CATEGORIES',
-              'ORDERS',
-              'MEMBERS',
-              'STATS',
-              'INQUIRIES',
-            ]"
-            :key="tab"
-            @click="activeTab = tab"
-            class="px-6 py-2 text-xs uppercase tracking-widest transition-all relative"
-            :class="
-              activeTab === tab
-                ? 'bg-sumi text-washi'
-                : 'text-stone-500 hover:bg-stone-50'
-            "
+        <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <div
+            class="flex gap-1 bg-white p-1 rounded-sm border border-stone-200 min-w-max"
           >
-            {{ tab }}
-            <!-- 未讀訊息徽章 -->
-            <span
-              v-if="tab === 'INQUIRIES' && unreadInquiriesCount > 0"
-              class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm"
+            <button
+              v-for="tab in [
+                'INVENTORY',
+                'CATEGORIES',
+                'ORDERS',
+                'MEMBERS',
+                'STATS',
+                'INQUIRIES',
+              ]"
+              :key="tab"
+              @click="activeTab = tab"
+              class="px-3 md:px-6 py-2 text-xs uppercase tracking-widest transition-all relative whitespace-nowrap"
+              :class="
+                activeTab === tab
+                  ? 'bg-sumi text-washi'
+                  : 'text-stone-500 hover:bg-stone-50'
+              "
             >
-              {{ unreadInquiriesCount > 99 ? "99+" : unreadInquiriesCount }}
-            </span>
-            <!-- 待處理訂單徽章 -->
-            <span
-              v-if="tab === 'ORDERS' && pendingOrdersCount > 0"
-              class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm"
-            >
-              {{ pendingOrdersCount > 99 ? "99+" : pendingOrdersCount }}
-            </span>
-          </button>
+              {{ tab }}
+              <!-- 未讀訊息徽章 -->
+              <span
+                v-if="tab === 'INQUIRIES' && unreadInquiriesCount > 0"
+                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm"
+              >
+                {{ unreadInquiriesCount > 99 ? "99+" : unreadInquiriesCount }}
+              </span>
+              <!-- 待處理訂單徽章 -->
+              <span
+                v-if="tab === 'ORDERS' && pendingOrdersCount > 0"
+                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm"
+              >
+                {{ pendingOrdersCount > 99 ? "99+" : pendingOrdersCount }}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white border border-stone-200 shadow-sm min-h-[600px] p-8">
+      <div
+        class="bg-white border border-stone-200 shadow-sm min-h-[400px] md:min-h-[600px] p-4 md:p-8"
+      >
         <!-- Inventory Tab -->
         <div v-if="activeTab === 'INVENTORY'" class="space-y-6">
           <div
-            class="flex justify-between items-center border-b border-stone-100 pb-4"
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-100 pb-4"
           >
             <h2 class="font-serif text-xl text-sumi">Product Inventory</h2>
             <button
               @click="openNewProductForm"
-              class="px-6 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800 transition-colors"
+              class="px-4 md:px-6 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800 transition-colors"
             >
               + New Product
             </button>
@@ -958,9 +980,9 @@ const monthlySales = computed(() => {
             >
               <!-- 頂部：配送方式 + 訂單編號 + 日期 -->
               <div
-                class="flex items-center justify-between mb-4 pb-4 border-b border-stone-200"
+                class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-4 border-b border-stone-200"
               >
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-2 md:gap-4">
                   <!-- 配送方式（置頂顯眼） -->
                   <span
                     class="px-4 py-2 text-sm font-bold rounded"
@@ -978,14 +1000,14 @@ const monthlySales = computed(() => {
                         : "宅配"
                     }}
                   </span>
-                  <span class="font-serif text-lg text-sumi"
+                  <span class="font-serif text-base md:text-lg text-sumi"
                     >Order #{{ order.id }}</span
                   >
-                  <span class="text-xs text-stone-400">{{
+                  <span class="text-xs text-stone-400 hidden sm:inline">{{
                     order.createdAt
                   }}</span>
                 </div>
-                <span class="font-serif text-2xl text-sumi"
+                <span class="font-serif text-lg md:text-2xl text-sumi"
                   >${{ order.total }}</span
                 >
               </div>
@@ -1355,18 +1377,58 @@ const monthlySales = computed(() => {
               <div class="flex justify-between items-start mb-4">
                 <div>
                   <h3 class="font-serif text-sumi">{{ inquiry.name }}</h3>
-                  <p class="text-xs text-stone-400">{{ inquiry.email }}</p>
+                  <a
+                    :href="`mailto:${
+                      inquiry.email
+                    }?subject=Re: 您的詢問 - Choose&body=您好 ${
+                      inquiry.name
+                    }，%0A%0A感謝您的詢問：%0A「${encodeURIComponent(
+                      inquiry.message
+                    )}」%0A%0A`"
+                    class="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {{ inquiry.email }}
+                  </a>
                 </div>
-                <span class="text-xs text-stone-400">{{
-                  inquiry.date || inquiry.createdAt
-                }}</span>
+                <div class="text-right">
+                  <p class="text-sm text-stone-400">Date</p>
+                  <p class="text-xs text-stone-500 font-medium">
+                    {{ formatDateTime(inquiry.createdAt) }}
+                  </p>
+                </div>
               </div>
               <p
                 class="text-sm text-stone-600 font-light mb-4 leading-relaxed bg-white p-4 border border-stone-100"
               >
                 {{ inquiry.message }}
               </p>
-              <div class="flex justify-end">
+              <div class="flex justify-end gap-3">
+                <a
+                  :href="`mailto:${
+                    inquiry.email
+                  }?subject=Re: 您的詢問 - Choose&body=您好 ${
+                    inquiry.name
+                  }，%0A%0A感謝您的詢問：%0A「${encodeURIComponent(
+                    inquiry.message
+                  )}」%0A%0A`"
+                  class="px-4 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50 inline-flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Reply by Email
+                </a>
                 <button
                   v-if="inquiry.status !== 'REPLIED'"
                   @click="emit('reply-inquiry', inquiry.id)"

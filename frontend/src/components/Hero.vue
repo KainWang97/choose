@@ -38,7 +38,7 @@ const handleExplore = () => {
     <div class="relative z-10 flex flex-col items-center text-center space-y-4">
       <h1 class="inline-block animate-breathe" style="animation-delay: 0s, 2s">
         <span
-          class="inline-block text-stone-600 tracking-[0.3em] text-4xl md:text-xl font-medium uppercase transition-all duration-500 hover-glow"
+          class="inline-block text-stone-600 tracking-[0.3em] text-sm md:text-2xl font-medium uppercase transition-all duration-500 hover-glow"
         >
           Choose a tasteful life
         </span>

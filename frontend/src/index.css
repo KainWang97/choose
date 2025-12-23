@@ -14,10 +14,12 @@
 }
 
 /* 基礎樣式 */
+html,
 body {
   background-color: var(--color-washi);
   color: var(--color-sumi);
   font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
 h1,
