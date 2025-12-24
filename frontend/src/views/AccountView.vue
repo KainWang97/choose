@@ -57,6 +57,22 @@ const isChangingPassword = ref(false);
 const passwordError = ref("");
 const passwordSuccess = ref("");
 
+// 密碼顯示狀態
+const showPasswordFields = ref({
+  current: false,
+  new: false,
+  confirm: false,
+  delete: false,
+});
+
+// 密碼欄位 focus 狀態
+const passwordFocused = ref({
+  current: false,
+  new: false,
+  confirm: false,
+  delete: false,
+});
+
 // 刪除帳號 State
 const showDeleteConfirm = ref(false);
 const deleteForm = ref({
@@ -521,13 +537,63 @@ const handleChangePassword = async () => {
               >
                 目前密碼
               </label>
-              <input
-                type="password"
-                v-model="passwordForm.currentPassword"
-                required
-                placeholder="請輸入目前密碼"
-                class="w-full bg-white border border-stone-300 p-3 text-sm focus:outline-none focus:border-sumi"
-              />
+              <div class="relative">
+                <input
+                  :type="showPasswordFields.current ? 'text' : 'password'"
+                  v-model="passwordForm.currentPassword"
+                  required
+                  placeholder="請輸入目前密碼"
+                  @focus="passwordFocused.current = true"
+                  @blur="passwordFocused.current = false"
+                  class="w-full bg-white border border-stone-300 p-3 pr-10 text-sm focus:outline-none focus:border-sumi"
+                />
+                <button
+                  v-if="
+                    passwordFocused.current &&
+                    passwordForm.currentPassword.length > 0
+                  "
+                  type="button"
+                  @mousedown.prevent="
+                    showPasswordFields.current = !showPasswordFields.current
+                  "
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                >
+                  <svg
+                    v-if="!showPasswordFields.current"
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  <svg
+                    v-else
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div>
               <label
@@ -535,14 +601,63 @@ const handleChangePassword = async () => {
               >
                 新密碼
               </label>
-              <input
-                type="password"
-                v-model="passwordForm.newPassword"
-                required
-                minlength="6"
-                placeholder="請輸入新密碼（至少 6 個字元）"
-                class="w-full bg-white border border-stone-300 p-3 text-sm focus:outline-none focus:border-sumi"
-              />
+              <div class="relative">
+                <input
+                  :type="showPasswordFields.new ? 'text' : 'password'"
+                  v-model="passwordForm.newPassword"
+                  required
+                  minlength="6"
+                  placeholder="請輸入新密碼（至少 6 個字元）"
+                  @focus="passwordFocused.new = true"
+                  @blur="passwordFocused.new = false"
+                  class="w-full bg-white border border-stone-300 p-3 pr-10 text-sm focus:outline-none focus:border-sumi"
+                />
+                <button
+                  v-if="
+                    passwordFocused.new && passwordForm.newPassword.length > 0
+                  "
+                  type="button"
+                  @mousedown.prevent="
+                    showPasswordFields.new = !showPasswordFields.new
+                  "
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                >
+                  <svg
+                    v-if="!showPasswordFields.new"
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  <svg
+                    v-else
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div>
               <label
@@ -550,13 +665,63 @@ const handleChangePassword = async () => {
               >
                 確認新密碼
               </label>
-              <input
-                type="password"
-                v-model="passwordForm.confirmPassword"
-                required
-                placeholder="請再次輸入新密碼"
-                class="w-full bg-white border border-stone-300 p-3 text-sm focus:outline-none focus:border-sumi"
-              />
+              <div class="relative">
+                <input
+                  :type="showPasswordFields.confirm ? 'text' : 'password'"
+                  v-model="passwordForm.confirmPassword"
+                  required
+                  placeholder="請再次輸入新密碼"
+                  @focus="passwordFocused.confirm = true"
+                  @blur="passwordFocused.confirm = false"
+                  class="w-full bg-white border border-stone-300 p-3 pr-10 text-sm focus:outline-none focus:border-sumi"
+                />
+                <button
+                  v-if="
+                    passwordFocused.confirm &&
+                    passwordForm.confirmPassword.length > 0
+                  "
+                  type="button"
+                  @mousedown.prevent="
+                    showPasswordFields.confirm = !showPasswordFields.confirm
+                  "
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                >
+                  <svg
+                    v-if="!showPasswordFields.confirm"
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  <svg
+                    v-else
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <p v-if="passwordError" class="text-sm text-red-600">
               {{ passwordError }}
@@ -605,12 +770,61 @@ const handleChangePassword = async () => {
               <label class="block text-xs text-stone-600 mb-1">
                 請輸入密碼以驗證身分
               </label>
-              <input
-                type="password"
-                v-model="deleteForm.password"
-                placeholder="請輸入密碼"
-                class="w-full bg-white border border-stone-300 p-2 text-sm focus:outline-none focus:border-red-400"
-              />
+              <div class="relative">
+                <input
+                  :type="showPasswordFields.delete ? 'text' : 'password'"
+                  v-model="deleteForm.password"
+                  placeholder="請輸入密碼"
+                  @focus="passwordFocused.delete = true"
+                  @blur="passwordFocused.delete = false"
+                  class="w-full bg-white border border-stone-300 p-2 pr-10 text-sm focus:outline-none focus:border-red-400"
+                />
+                <button
+                  v-if="
+                    passwordFocused.delete && deleteForm.password.length > 0
+                  "
+                  type="button"
+                  @mousedown.prevent="
+                    showPasswordFields.delete = !showPasswordFields.delete
+                  "
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                >
+                  <svg
+                    v-if="!showPasswordFields.delete"
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  <svg
+                    v-else
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div>
               <label class="block text-xs text-stone-600 mb-1">

@@ -381,7 +381,7 @@
 └── service/                        # 業務層 (7 個)
     ├── CartService.java            # 庫存檢查、數量合併
     ├── CategoryService.java
-    ├── ContactMessageService.java  # markAsRead(), markAsReplied()
+    ├── ContactMessageService.java  # markAsRead(), markAsReplied(), markAsUnreplied()
     ├── ImageUploadService.java     # Cloudinary upload (限 jpg/png/gif/webp)
     ├── OrderService.java           # @Transactional 原子化下單、庫存扣減
     ├── ProductService.java         # SKU 生成、精選上限 8 件
@@ -527,8 +527,11 @@
             <tr>
               <td><code>InquiryController</code></td>
               <td>/api/inquiries</td>
-              <td>6</td>
-              <td>擷取 <code>X-Forwarded-For</code> 取得真實 IP</td>
+              <td>7</td>
+              <td>
+                擷取 <code>X-Forwarded-For</code> 取得真實
+                IP、支援取消已回覆狀態
+              </td>
             </tr>
             <tr>
               <td><code>OrderController</code></td>
@@ -633,8 +636,11 @@
             </tr>
             <tr>
               <td><code>ContactMessageService</code></td>
-              <td><code>markAsRead()</code>, <code>markAsReplied()</code></td>
-              <td>更新 isRead / isReplied 欄位</td>
+              <td>
+                <code>markAsRead()</code>, <code>markAsReplied()</code>,
+                <code>markAsUnreplied()</code>
+              </td>
+              <td>更新 isRead / isReplied 欄位；支援取消已回覆</td>
             </tr>
           </tbody>
         </table>
@@ -1265,6 +1271,12 @@ public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; clearCart(
               <td>標記為已回覆</td>
             </tr>
             <tr>
+              <td>markAsUnreplied()</td>
+              <td>PATCH /{id}/unreply</td>
+              <td>ADMIN</td>
+              <td>取消已回覆狀態（恢復為未讀）</td>
+            </tr>
+            <tr>
               <td>deleteInquiry()</td>
               <td>DELETE /{id}</td>
               <td>ADMIN</td>
@@ -1874,6 +1886,10 @@ public Order createOrder(Long userId, Order orderData) { ... }</code></pre>
             <tr>
               <td>markAsReplied()</td>
               <td>標記已回覆（記錄時間）</td>
+            </tr>
+            <tr>
+              <td>markAsUnreplied()</td>
+              <td>取消已回覆（清除時間、恢復為未讀）</td>
             </tr>
             <tr>
               <td>deleteMessage()</td>

@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### project_architecture.html ###
-# project_architecture.html
+### personal files ###
+project_architecture.html
+start-dev.sh
