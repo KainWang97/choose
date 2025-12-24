@@ -71,6 +71,13 @@ public class InquiryController {
         return ResponseEntity.ok(ApiResponse.success("Marked as replied", InquiryDTO.fromEntity(message)));
     }
 
+    @PatchMapping("/{messageId}/unreply")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<InquiryDTO>> markAsUnreplied(@PathVariable Long messageId) {
+        ContactMessage message = contactMessageService.markAsUnreplied(messageId);
+        return ResponseEntity.ok(ApiResponse.success("Marked as unreplied", InquiryDTO.fromEntity(message)));
+    }
+
     @DeleteMapping("/{messageId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteInquiry(@PathVariable Long messageId) {

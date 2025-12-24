@@ -656,6 +656,21 @@ export const inquiryApi = {
       return false;
     }
   },
+
+  /**
+   * 取消已回覆 (Admin)
+   * PATCH /api/inquiries/:id/unreply
+   * @param {string} id
+   * @returns {Promise<boolean>}
+   */
+  async markAsUnreplied(id) {
+    try {
+      await apiPatch(`/inquiries/${id}/unreply`);
+      return true;
+    } catch {
+      return false;
+    }
+  },
 };
 
 // ============================================

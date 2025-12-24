@@ -533,6 +533,16 @@ const handleReplyInquiry = async (id) => {
   }
 };
 
+const handleUnreplyInquiry = async (id) => {
+  try {
+    await api.inquiries.markAsUnreplied(id);
+    const inquiry = inquiries.value.find((i) => i.id === id);
+    if (inquiry) inquiry.status = "UNREAD";
+  } catch (error) {
+    console.error("Failed to unreply inquiry:", error);
+  }
+};
+
 // ============================================
 // Admin: Product CRUD
 // ============================================
@@ -744,6 +754,7 @@ provide("handleContactSubmit", handleContactSubmit);
 provide("handlePlaceOrder", handlePlaceOrder);
 provide("handleUpdateOrderStatus", handleUpdateOrderStatus);
 provide("handleReplyInquiry", handleReplyInquiry);
+provide("handleUnreplyInquiry", handleUnreplyInquiry);
 provide("handleCreateProduct", handleCreateProduct);
 provide("handleUpdateProduct", handleUpdateProduct);
 provide("handleDeleteProduct", handleDeleteProduct);

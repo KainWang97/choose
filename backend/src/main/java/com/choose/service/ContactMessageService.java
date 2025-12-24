@@ -56,6 +56,15 @@ public class ContactMessageService {
     }
 
     @Transactional
+    public ContactMessage markAsUnreplied(Long messageId) {
+        ContactMessage message = contactMessageRepository.findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+        message.setStatus(ContactMessage.MessageStatus.UNREAD);
+        message.setRepliedAt(null);
+        return contactMessageRepository.save(message);
+    }
+
+    @Transactional
     public void deleteMessage(Long messageId) {
         if (!contactMessageRepository.existsById(messageId)) {
             throw new IllegalArgumentException("Message not found");

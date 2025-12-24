@@ -20,6 +20,7 @@ const props = defineProps({
 const emit = defineEmits([
   "update-order-status",
   "reply-inquiry",
+  "unreply-inquiry",
   "create-product",
   "update-product",
   "delete-product",
@@ -592,7 +593,7 @@ const monthlySales = computed(() => {
 
 <template>
   <div
-    class="min-h-screen bg-stone-100 pt-24 pb-12 px-4 md:px-8 animate-fade-in"
+    class="min-h-screen bg-stone-100 pt-2 pb-12 px-4 md:px-8 animate-fade-in"
   >
     <div class="max-w-7xl mx-auto">
       <div class="flex justify-between gap-4 mb-6 md:mb-8">
@@ -1471,12 +1472,14 @@ const monthlySales = computed(() => {
                 >
                   Mark as Replied
                 </button>
-                <span
+                <button
                   v-else
-                  class="text-xs uppercase tracking-widest text-green-700 flex items-center gap-2"
+                  @click="emit('unreply-inquiry', inquiry.id)"
+                  class="text-xs uppercase tracking-widest text-green-700 flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer"
+                  title="點擊取消已回覆狀態"
                 >
                   ✓ Replied
-                </span>
+                </button>
               </div>
             </div>
           </div>
