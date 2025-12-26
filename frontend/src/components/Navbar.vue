@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted, watch } from "vue";
 import { useConfirm } from "../composables/useConfirm.js";
 
 const props = defineProps({
@@ -26,6 +26,22 @@ const isSearchOpen = ref(false);
 const searchQuery = ref("");
 const searchInput = ref(null);
 const searchContainer = ref(null);
+const isMobileMenuOpen = ref(false);
+
+// 關閉手機選單
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false;
+};
+
+// 手機選單項目點擊處理
+const handleMobileMenuAction = (action, payload = null) => {
+  closeMobileMenu();
+  if (payload) {
+    emit(action, payload);
+  } else {
+    emit(action);
+  }
+};
 
 // 點擊外部區域收回搜尋框
 const handleClickOutside = (event) => {
@@ -47,7 +63,17 @@ onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 
+// 防止手機選單開啟時背景滾動
+watch(isMobileMenuOpen, (isOpen) => {
+  if (isOpen) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+});
+
 const handleLogout = async () => {
+  closeMobileMenu();
   const confirmed = await confirm({
     title: "登出確認",
     message: "確定要登出嗎？",
@@ -108,15 +134,15 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
         Choose
       </button>
 
+      <!-- 桌面版導覽列 (md 以上顯示) -->
       <div
-        class="flex items-center gap-3 md:gap-6 text-sm tracking-widest text-stone-600 font-light"
+        class="hidden md:flex items-center gap-6 text-sm tracking-widest text-stone-600 font-light"
       >
         <!-- Admin Link -->
         <button
           v-if="isAdmin"
           @click="emit('open-admin')"
           class="text-red-900 font-medium hover:text-red-700 transition-colors uppercase border-b border-red-900/20"
-          :class="{ hidden: isSearchOpen }"
         >
           Dashboard
         </button>
@@ -126,30 +152,16 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
           v-if="!isAdmin && !isOnCollectionPage"
           @click="emit('collection')"
           class="hover:text-sumi transition-all duration-300 group relative"
-          :class="{ 'hidden sm:block': isSearchOpen }"
           title="Collection"
         >
-          <!-- 大螢幕顯示文字 -->
-          <span class="hidden md:block relative cursor-pointer">
+          <span class="relative cursor-pointer">
             COLLECTION
-            <!-- 底線動畫效果 -->
             <span
               class="absolute left-0 -bottom-1 w-0 h-[1px] bg-sumi transition-all duration-300 group-hover:w-full"
             ></span>
           </span>
-          <!-- 小螢幕顯示圖示 -->
-          <svg
-            class="w-6 h-6 stroke-current stroke-1 group-hover:stroke-2 group-hover:scale-110 transition-all duration-300 md:hidden"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-            />
-          </svg>
         </button>
+
         <!-- Search (非管理員顯示) -->
         <div
           v-if="!isAdmin"
@@ -164,7 +176,7 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
             @keydown.escape="toggleSearch"
             type="text"
             placeholder="搜尋商品..."
-            class="w-32 sm:w-40 md:w-56 px-3 py-1.5 text-sm border border-stone-300 rounded-sm bg-white/80 focus:outline-none focus:border-stone-500 transition-all"
+            class="w-56 px-3 py-1.5 text-sm border border-stone-300 rounded-sm bg-white/80 focus:outline-none focus:border-stone-500 transition-all"
           />
           <button
             @click="isSearchOpen ? handleSearch() : toggleSearch()"
@@ -184,12 +196,12 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
             </svg>
           </button>
         </div>
+
         <!-- Cart Icon (非管理員顯示) -->
         <button
           v-if="!isAdmin"
           @click="emit('open-cart')"
           class="hover:text-sumi transition-colors flex items-center gap-1 group"
-          :class="{ 'hidden sm:flex': isSearchOpen }"
         >
           <svg
             class="w-6 h-6 stroke-current stroke-1 group-hover:stroke-2 transition-all"
@@ -209,12 +221,12 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
             {{ cartCount }}
           </span>
         </button>
+
         <!-- Account Icon (非管理員顯示) -->
         <button
           v-if="!isAdmin"
           @click="user ? emit('open-account') : emit('open-auth')"
           class="hover:text-sumi transition-colors group relative"
-          :class="{ 'hidden sm:block': isSearchOpen }"
           :title="user ? 'My Account' : 'Login'"
         >
           <svg
@@ -241,23 +253,234 @@ const isAdmin = computed(() => props.user?.role === "ADMIN");
             v-if="isLoggingOut"
             class="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
           ></span>
-          <span class="hidden sm:inline">{{
-            isLoggingOut ? "..." : "LOGOUT"
-          }}</span>
-          <svg
-            class="w-5 h-5 sm:hidden stroke-current"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
+          {{ isLoggingOut ? "..." : "LOGOUT" }}
         </button>
       </div>
+
+      <!-- 手機版漢堡選單按鈕 (md 以下顯示) -->
+      <button
+        @click="isMobileMenuOpen = !isMobileMenuOpen"
+        class="md:hidden p-2 text-stone-600 hover:text-sumi transition-colors"
+        aria-label="選單"
+      >
+        <!-- 漢堡圖示 / X 圖示切換 -->
+        <svg
+          class="w-6 h-6 transition-transform duration-300"
+          :class="{ 'rotate-90': isMobileMenuOpen }"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            v-if="!isMobileMenuOpen"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+          <path
+            v-else
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
     </div>
   </nav>
+
+  <!-- 手機版側邊選單 -->
+  <Teleport to="body">
+    <!-- 背景遮罩 -->
+    <Transition name="fade">
+      <div
+        v-if="isMobileMenuOpen"
+        class="fixed inset-0 bg-black/40 z-[60] md:hidden"
+        @click="closeMobileMenu"
+      />
+    </Transition>
+
+    <!-- 滑出選單 -->
+    <Transition name="slide-right">
+      <div
+        v-if="isMobileMenuOpen"
+        class="fixed top-0 right-0 w-72 h-full bg-washi z-[70] shadow-xl md:hidden overflow-y-auto"
+      >
+        <!-- 選單標題 -->
+        <div
+          class="flex justify-between items-center p-6 border-b border-stone-200"
+        >
+          <span class="text-lg font-serif tracking-widest text-sumi">選單</span>
+          <button
+            @click="closeMobileMenu"
+            class="p-2 text-stone-500 hover:text-sumi transition-colors"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 選單項目 -->
+        <div class="py-4">
+          <!-- Admin Dashboard -->
+          <button
+            v-if="isAdmin"
+            @click="handleMobileMenuAction('open-admin')"
+            class="w-full px-6 py-4 text-left text-red-900 font-medium hover:bg-stone-100 transition-colors flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+              />
+            </svg>
+            Dashboard
+          </button>
+
+          <!-- Collection -->
+          <button
+            v-if="!isAdmin && !isOnCollectionPage"
+            @click="handleMobileMenuAction('collection')"
+            class="w-full px-6 py-4 text-left text-stone-700 hover:bg-stone-100 transition-colors flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+              />
+            </svg>
+            商品列表
+          </button>
+
+          <!-- Cart (非管理員) -->
+          <button
+            v-if="!isAdmin"
+            @click="handleMobileMenuAction('open-cart')"
+            class="w-full px-6 py-4 text-left text-stone-700 hover:bg-stone-100 transition-colors flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              />
+            </svg>
+            購物車
+            <span
+              v-if="cartCount > 0"
+              class="ml-auto bg-sumi text-washi text-xs px-2 py-0.5 rounded-full"
+            >
+              {{ cartCount }}
+            </span>
+          </button>
+
+          <!-- Account (非管理員) -->
+          <button
+            v-if="!isAdmin"
+            @click="handleMobileMenuAction(user ? 'open-account' : 'open-auth')"
+            class="w-full px-6 py-4 text-left text-stone-700 hover:bg-stone-100 transition-colors flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            {{ user ? "我的帳戶" : "登入 / 註冊" }}
+          </button>
+
+          <!-- 分隔線 -->
+          <div v-if="user" class="my-2 border-t border-stone-200"></div>
+
+          <!-- Logout -->
+          <button
+            v-if="user"
+            @click="handleLogout"
+            :disabled="isLoggingOut"
+            class="w-full px-6 py-4 text-left text-stone-500 hover:bg-stone-100 transition-colors flex items-center gap-3 disabled:opacity-50"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            <span
+              v-if="isLoggingOut"
+              class="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
+            ></span>
+            {{ isLoggingOut ? "登出中..." : "登出" }}
+          </button>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
+
+<style scoped>
+/* 淡入淡出動畫 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 右側滑入動畫 */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+  transform: translateX(100%);
+}
+</style>
