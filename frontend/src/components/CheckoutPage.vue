@@ -247,6 +247,7 @@ const handleFinalSubmit = async () => {
                 type="email"
                 v-model="formData.email"
                 placeholder="您的電子郵件地址"
+                autocomplete="email"
                 class="w-full bg-transparent border-b py-2 focus:outline-none transition-colors rounded-none"
                 :class="
                   validationErrors.email
@@ -271,6 +272,7 @@ const handleFinalSubmit = async () => {
                 type="text"
                 v-model="formData.fullName"
                 placeholder="收件人姓名"
+                autocomplete="name"
                 class="w-full bg-transparent border-b py-2 focus:outline-none transition-colors rounded-none"
                 :class="
                   validationErrors.fullName
@@ -295,6 +297,7 @@ const handleFinalSubmit = async () => {
                 type="tel"
                 v-model="formData.phone"
                 placeholder="聯絡電話（例：0912345678）"
+                autocomplete="tel"
                 class="w-full bg-transparent border-b py-2 focus:outline-none transition-colors rounded-none"
                 :class="
                   validationErrors.phone
@@ -412,6 +415,7 @@ const handleFinalSubmit = async () => {
                   <input
                     v-model="formData.city"
                     placeholder="縣市（例：台北市）"
+                    autocomplete="address-level1"
                     class="w-full bg-transparent border-b py-2 focus:outline-none transition-colors rounded-none"
                     :class="
                       validationErrors.city
@@ -436,6 +440,7 @@ const handleFinalSubmit = async () => {
                 <input
                   v-model="formData.address"
                   placeholder="詳細地址（例：信義區松高路1號10樓）"
+                  autocomplete="street-address"
                   class="w-full bg-transparent border-b py-2 focus:outline-none transition-colors rounded-none"
                   :class="
                     validationErrors.address
