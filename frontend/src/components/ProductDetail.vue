@@ -314,7 +314,7 @@ const handleAddToCart = () => {
           <!-- 縮圖列表 -->
           <div
             v-if="currentImages.length > 1"
-            class="flex gap-2 overflow-x-auto pb-2"
+            class="flex justify-center gap-2 flex-wrap pt-2"
           >
             <button
               v-for="(img, index) in currentImages"

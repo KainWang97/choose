@@ -620,6 +620,23 @@ const filteredInquiries = computed(() => {
   return result;
 });
 
+// 展開的訊息 ID Set
+const expandedInquiryIds = ref(new Set());
+
+const toggleInquiryExpand = (inquiryId) => {
+  if (expandedInquiryIds.value.has(inquiryId)) {
+    expandedInquiryIds.value.delete(inquiryId);
+  } else {
+    expandedInquiryIds.value.add(inquiryId);
+  }
+  // 觸發響應式更新
+  expandedInquiryIds.value = new Set(expandedInquiryIds.value);
+};
+
+const isInquiryExpanded = (inquiryId) => {
+  return expandedInquiryIds.value.has(inquiryId);
+};
+
 // 確認結案
 const confirmCloseInquiry = async (inquiry) => {
   const confirmed = await confirm({
@@ -702,6 +719,47 @@ const deleteTemplate = async (templateId) => {
     console.error("Failed to delete template:", error);
   }
 };
+
+// ============================================
+// Member Statistics Modal
+// ============================================
+const isMemberStatsModalOpen = ref(false);
+const selectedMember = ref(null);
+const memberStats = ref(null);
+const isLoadingMemberStats = ref(false);
+
+const openMemberStatsModal = async (member) => {
+  selectedMember.value = member;
+  memberStats.value = null;
+  isLoadingMemberStats.value = true;
+  isMemberStatsModalOpen.value = true;
+
+  try {
+    const { api } = await import("../services/api.js");
+    memberStats.value = await api.users.getStatistics(member.id);
+  } catch (error) {
+    console.error("Failed to load member statistics:", error);
+  } finally {
+    isLoadingMemberStats.value = false;
+  }
+};
+
+const closeMemberStatsModal = () => {
+  isMemberStatsModalOpen.value = false;
+  selectedMember.value = null;
+  memberStats.value = null;
+};
+
+// 格式化日期
+const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleDateString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
+
 // Helper: 取得訂單項目顯示文字
 const getOrderItemsText = (order) => {
   return order.items
@@ -1495,7 +1553,9 @@ const monthlySales = computed(() => {
                   class="text-xs uppercase tracking-widest text-stone-400 border-b border-stone-200"
                 >
                   <th class="pb-4 font-normal">帳號</th>
+                  <th class="pb-4 font-normal">姓名</th>
                   <th class="pb-4 font-normal text-center">訂單數</th>
+                  <th class="pb-4 font-normal text-center">操作</th>
                 </tr>
               </thead>
               <tbody class="text-sm font-light text-stone-600">
@@ -1507,10 +1567,21 @@ const monthlySales = computed(() => {
                   <td class="py-4 pr-4 font-medium text-sumi">
                     {{ member.email }}
                   </td>
+                  <td class="py-4 pr-4">
+                    {{ member.name || "-" }}
+                  </td>
                   <td class="py-4 pr-4 text-center">
                     <span class="bg-stone-100 px-3 py-1 rounded text-xs">
                       {{ member.orderCount || 0 }}
                     </span>
+                  </td>
+                  <td class="py-4 text-center">
+                    <button
+                      @click="openMemberStatsModal(member)"
+                      class="px-3 py-1 text-xs border border-stone-300 text-stone-600 hover:bg-stone-100 transition-colors"
+                    >
+                      消費統計
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -1684,39 +1755,28 @@ const monthlySales = computed(() => {
             <div
               v-for="inquiry in filteredInquiries"
               :key="inquiry.id"
-              class="p-6 border-2 rounded transition-all"
+              class="border-2 rounded transition-all overflow-hidden"
               :class="
                 inquiry.status === 'PENDING'
                   ? 'border-amber-400 bg-amber-50 shadow-md'
                   : inquiry.status === 'REPLIED_TRACKING'
                   ? 'border-orange-300 bg-orange-50'
-                  : 'border-stone-200 bg-stone-50 opacity-70'
+                  : 'border-stone-200 bg-stone-50 opacity-80'
               "
             >
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <h3 class="font-serif text-sumi">{{ inquiry.name }}</h3>
-                    <span
-                      v-if="inquiry.caseNumber"
-                      class="text-sm font-mono text-stone-400 bg-stone-100 px-2 py-0.5 rounded"
-                    >
-                      編號:{{ inquiry.caseNumber }}
-                    </span>
-                  </div>
-                  <p v-if="inquiry.subject" class="text-xs text-stone-500 mb-1">
-                    主題：{{ inquiry.subject }}
-                  </p>
-                  <a
-                    :href="`mailto:${inquiry.email}`"
-                    class="text-xs text-blue-600 hover:text-blue-800 hover:underline"
-                  >
-                    {{ inquiry.email }}
-                  </a>
-                </div>
-                <div class="text-right">
+              <!-- 標題列（可點擊展開/收合） -->
+              <div
+                class="p-4 cursor-pointer hover:bg-white/30 transition-colors flex justify-between items-center"
+                @click="toggleInquiryExpand(inquiry.id)"
+              >
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <!-- 展開/收合圖示 -->
+                  <span class="text-stone-400 text-sm shrink-0">
+                    {{ isInquiryExpanded(inquiry.id) ? "▼" : "▶" }}
+                  </span>
+                  <!-- 狀態標籤（放大） -->
                   <span
-                    class="inline-block px-2 py-1 text-xs uppercase tracking-wider rounded mb-2"
+                    class="px-3 py-1.5 text-sm font-medium rounded shrink-0"
                     :class="
                       inquiry.status === 'PENDING'
                         ? 'bg-amber-500 text-white'
@@ -1733,68 +1793,109 @@ const monthlySales = computed(() => {
                         : "已結案"
                     }}
                   </span>
+                  <!-- 案件編號 -->
+                  <span
+                    v-if="inquiry.caseNumber"
+                    class="text-xs font-mono text-stone-500 bg-white/50 px-2 py-1 rounded shrink-0"
+                  >
+                    {{ inquiry.caseNumber }}
+                  </span>
+                  <!-- 姓名與主題 -->
+                  <div class="min-w-0 flex-1">
+                    <span class="font-medium text-sumi">{{
+                      inquiry.name
+                    }}</span>
+                    <span
+                      v-if="inquiry.subject"
+                      class="text-stone-500 ml-2 text-sm truncate"
+                    >
+                      - {{ inquiry.subject }}
+                    </span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0 ml-4">
                   <p class="text-xs text-stone-500">
                     {{ formatDateTime(inquiry.createdAt) }}
                   </p>
                 </div>
               </div>
-              <p
-                class="text-sm text-stone-600 font-light mb-4 leading-relaxed bg-white p-4 border border-stone-100"
-              >
-                {{ inquiry.message }}
-              </p>
-              <!-- 顯示已回覆內容 -->
+
+              <!-- 展開內容 -->
               <div
-                v-if="inquiry.adminReply"
-                class="mb-4 p-4 bg-green-50 border border-green-200 rounded"
+                v-if="isInquiryExpanded(inquiry.id)"
+                class="px-6 pb-6 pt-2 border-t border-stone-200/50"
               >
-                <p class="text-xs text-green-600 uppercase tracking-wider mb-1">
-                  已回覆內容
-                </p>
-                <p class="text-sm text-stone-700 whitespace-pre-wrap">
-                  {{ inquiry.adminReply }}
-                </p>
-                <p v-if="inquiry.repliedAt" class="text-xs text-stone-400 mt-2">
-                  回覆時間：{{ formatDateTime(inquiry.repliedAt) }}
-                </p>
-              </div>
-              <div class="flex justify-end gap-3">
-                <!-- Loading 狀態 -->
+                <!-- Email -->
+                <a
+                  :href="`mailto:${inquiry.email}`"
+                  class="text-sm text-blue-600 hover:text-blue-800 hover:underline mb-3 block"
+                >
+                  {{ inquiry.email }}
+                </a>
+                <!-- 訊息內容 -->
                 <div
-                  v-if="replyingInquiryId === inquiry.id"
-                  class="flex items-center gap-2 text-stone-500"
+                  class="text-sm text-stone-600 font-light mb-4 leading-relaxed bg-white p-4 border border-stone-100 rounded"
                 >
-                  <div
-                    class="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
-                  ></div>
-                  <span class="text-xs uppercase tracking-widest"
-                    >回覆中...</span
-                  >
+                  {{ inquiry.message }}
                 </div>
-                <!-- 待處理：顯示回覆按鈕 -->
-                <button
-                  v-else-if="inquiry.status === 'PENDING'"
-                  @click="openReplyModal(inquiry)"
-                  class="px-4 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800"
+                <!-- 顯示已回覆內容 -->
+                <div
+                  v-if="inquiry.adminReply"
+                  class="mb-4 p-4 bg-green-50 border border-green-200 rounded"
                 >
-                  回覆
-                </button>
-                <!-- 追蹤中：顯示結案按鈕 -->
-                <button
-                  v-if="inquiry.status === 'REPLIED_TRACKING'"
-                  @click="confirmCloseInquiry(inquiry)"
-                  class="px-4 py-2 bg-green-600 text-white text-xs uppercase tracking-widest hover:bg-green-700"
-                >
-                  結案
-                </button>
-                <!-- 已結案：顯示重開按鈕 -->
-                <button
-                  v-if="inquiry.status === 'CLOSED'"
-                  @click="confirmReopenInquiry(inquiry)"
-                  class="px-4 py-2 border border-stone-400 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-100"
-                >
-                  重新開啟
-                </button>
+                  <p
+                    class="text-xs text-green-600 uppercase tracking-wider mb-1"
+                  >
+                    已回覆內容
+                  </p>
+                  <p class="text-sm text-stone-700 whitespace-pre-wrap">
+                    {{ inquiry.adminReply }}
+                  </p>
+                  <p
+                    v-if="inquiry.repliedAt"
+                    class="text-xs text-stone-400 mt-2"
+                  >
+                    回覆時間：{{ formatDateTime(inquiry.repliedAt) }}
+                  </p>
+                </div>
+                <div class="flex justify-end gap-3">
+                  <!-- Loading 狀態 -->
+                  <div
+                    v-if="replyingInquiryId === inquiry.id"
+                    class="flex items-center gap-2 text-stone-500"
+                  >
+                    <div
+                      class="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
+                    ></div>
+                    <span class="text-xs uppercase tracking-widest"
+                      >回覆中...</span
+                    >
+                  </div>
+                  <!-- 待處理：顯示回覆按鈕 -->
+                  <button
+                    v-else-if="inquiry.status === 'PENDING'"
+                    @click="openReplyModal(inquiry)"
+                    class="px-4 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800"
+                  >
+                    回覆
+                  </button>
+                  <!-- 追蹤中：顯示結案按鈕 -->
+                  <button
+                    v-if="inquiry.status === 'REPLIED_TRACKING'"
+                    @click="confirmCloseInquiry(inquiry)"
+                    class="px-4 py-2 bg-green-600 text-white text-xs uppercase tracking-widest hover:bg-green-700"
+                  >
+                    結案
+                  </button>
+                  <!-- 已結案：顯示重開按鈕 -->
+                  <button
+                    v-if="inquiry.status === 'CLOSED'"
+                    @click="confirmReopenInquiry(inquiry)"
+                    class="px-4 py-2 border border-stone-400 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-100"
+                  >
+                    重新開啟
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2557,6 +2658,114 @@ const monthlySales = computed(() => {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Statistics Modal -->
+    <div
+      v-if="isMemberStatsModalOpen"
+      class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      @click.self="closeMemberStatsModal"
+    >
+      <div class="bg-white max-w-md w-full p-8 shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-serif text-xl text-sumi">會員消費統計</h2>
+          <button
+            @click="closeMemberStatsModal"
+            class="text-stone-400 hover:text-sumi text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- 會員資訊 -->
+        <div v-if="selectedMember" class="mb-6 pb-4 border-b border-stone-200">
+          <p class="font-medium text-sumi">{{ selectedMember.email }}</p>
+          <p class="text-sm text-stone-500">
+            {{ selectedMember.name || "未設定姓名" }}
+          </p>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="isLoadingMemberStats" class="flex justify-center py-8">
+          <div
+            class="w-8 h-8 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
+          ></div>
+        </div>
+
+        <!-- 統計資料 -->
+        <div v-else-if="memberStats" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-stone-50 p-4 rounded border border-stone-200">
+              <p class="text-xs uppercase tracking-wider text-stone-500 mb-1">
+                累計消費
+              </p>
+              <p class="text-xl font-serif text-sumi">
+                ${{ memberStats.totalSpent?.toLocaleString() || 0 }}
+              </p>
+            </div>
+            <div class="bg-stone-50 p-4 rounded border border-stone-200">
+              <p class="text-xs uppercase tracking-wider text-stone-500 mb-1">
+                平均客單價
+              </p>
+              <p class="text-xl font-serif text-sumi">
+                ${{ memberStats.averageOrderValue?.toLocaleString() || 0 }}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-stone-50 p-4 rounded border border-stone-200">
+              <p class="text-xs uppercase tracking-wider text-stone-500 mb-1">
+                訂單總數
+              </p>
+              <p class="text-xl font-serif text-sumi">
+                {{ memberStats.orderCount || 0 }}
+              </p>
+            </div>
+            <div class="bg-stone-50 p-4 rounded border border-stone-200">
+              <p class="text-xs uppercase tracking-wider text-stone-500 mb-1">
+                已完成訂單
+              </p>
+              <p class="text-xl font-serif text-sumi">
+                {{ memberStats.completedOrderCount || 0 }}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-stone-50 p-4 rounded border border-stone-200">
+              <p class="text-xs uppercase tracking-wider text-stone-500 mb-1">
+                首次消費
+              </p>
+              <p class="text-sm font-medium text-sumi">
+                {{ formatDate(memberStats.firstOrderDate) }}
+              </p>
+            </div>
+            <div class="bg-stone-50 p-4 rounded border border-stone-200">
+              <p class="text-xs uppercase tracking-wider text-stone-500 mb-1">
+                最近消費
+              </p>
+              <p class="text-sm font-medium text-sumi">
+                {{ formatDate(memberStats.lastOrderDate) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 無資料 -->
+        <div v-else class="text-center py-8 text-stone-400 italic">
+          無法載入統計資料
+        </div>
+
+        <div class="flex justify-end pt-6 border-t border-stone-100 mt-6">
+          <button
+            @click="closeMemberStatsModal"
+            class="px-6 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50"
+          >
+            關閉
+          </button>
         </div>
       </div>
     </div>

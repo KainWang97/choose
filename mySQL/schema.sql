@@ -194,7 +194,21 @@ INSERT INTO products (category_id, name, description, price, image_url, color_im
 (2, '標準版型桶形燈芯絨長褲', '質感燈芯絨面料，採用細條紋燈芯絨織法，觸感溫潤紮實，特殊的立體紋理展現復古優雅的視覺層次，更提供絕佳的秋冬保暖性。', 1480.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819334/%E7%B1%B3%E8%89%B2_%E6%A8%99%E6%BA%96%E7%89%88%E5%9E%8B%E6%A1%B6%E5%BD%A2%E7%87%88%E8%8A%AF%E7%B5%A8%E9%95%B7%E8%A4%B2_8c6t.png', '{"米色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819340/%E7%B1%B3%E8%89%B2_%E6%A8%99%E6%BA%96%E7%89%88%E5%9E%8B%E6%A1%B6%E5%BD%A2%E7%87%88%E8%8A%AF%E7%B5%A8%E9%95%B7%E8%A4%B2_8c6t_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819343/%E7%B1%B3%E8%89%B2_%E6%A8%99%E6%BA%96%E7%89%88%E5%9E%8B%E6%A1%B6%E5%BD%A2%E7%87%88%E8%8A%AF%E7%B5%A8%E9%95%B7%E8%A4%B2_8c6t_Detail.png"], "深灰色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819336/%E7%B1%B3%E8%89%B2_%E6%A8%99%E6%BA%96%E7%89%88%E5%9E%8B%E6%A1%B6%E5%BD%A2%E7%87%88%E8%8A%AF%E7%B5%A8%E9%95%B7%E8%A4%B2_8c6t_%E6%B7%B1%E7%81%B0%E8%89%B2.png"], "白色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819339/%E7%B1%B3%E8%89%B2_%E6%A8%99%E6%BA%96%E7%89%88%E5%9E%8B%E6%A1%B6%E5%BD%A2%E7%87%88%E8%8A%AF%E7%B5%A8%E9%95%B7%E8%A4%B2_8c6t_%E7%99%BD%E8%89%B2.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 9 DAY)),
 -- 新增 Coat (category_id = 3)
 (3, 'GORE-TEX WINDSTOPPER 羽絨外套', '極致保暖與戰術機能設計，靈感源自經典的Level 7極地防寒系統，採用立體充絨工藝，提供卓越的蓬鬆度與保溫效能，確保在極低溫環境下依然能鎖住體溫。', 5980.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819345/%E9%BB%91%E8%89%B2_GORE_TEX_WINDSTOPPER_%E7%BE%BD%E7%B5%A8%E5%A4%96%E5%A5%97_LEVEL7_jy3j.png', '{"黑色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819348/%E9%BB%91%E8%89%B2_GORE_TEX_WINDSTOPPER_%E7%BE%BD%E7%B5%A8%E5%A4%96%E5%A5%97_LEVEL7_jy3j_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819350/%E9%BB%91%E8%89%B2_GORE_TEX_WINDSTOPPER_%E7%BE%BD%E7%B5%A8%E5%A4%96%E5%A5%97_LEVEL7_jy3j_Back.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819353/%E9%BB%91%E8%89%B2_GORE_TEX_WINDSTOPPER_%E7%BE%BD%E7%B5%A8%E5%A4%96%E5%A5%97_LEVEL7_jy3j_Detail.png"], "淺灰": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819347/%E9%BB%91%E8%89%B2_GORE_TEX_WINDSTOPPER_%E7%BE%BD%E7%B5%A8%E5%A4%96%E5%A5%97_LEVEL7_jy3j_%E6%B7%BA%E7%81%B0.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 8 DAY)),
-(3, '衿切替長版大衣', '結合復古工裝元素與現代剪裁的經典長版大衣，經典丹寧與燈芯絨撞色設計，採用深色水洗丹寧面料，搭配質感的卡其色燈芯絨領片，展現濃郁的復古工藝美學。', 4580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819361/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo.png', '{"黑色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819367/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819370/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo_Detail.png"], "深橘色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819365/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo_%E6%B7%B1%E6%A9%98%E8%89%B2.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 7 DAY));
+(3, '復古工裝長版大衣', '結合復古工裝元素與現代剪裁的經典長版大衣，經典丹寧與燈芯絨撞色設計，採用深色水洗丹寧面料，搭配質感的卡其色燈芯絨領片，展現濃郁的復古工藝美學。', 4580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819361/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo.png', '{"黑色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819367/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819370/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo_Detail.png"], "深橘色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766819365/%E9%BB%91%E8%89%B2_%E8%A1%BF%E5%88%87_%E6%9B%BF__oexo_%E6%B7%B1%E6%A9%98%E8%89%B2.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 7 DAY)),
+-- 新增 Bottom (category_id = 2)
+(2, '直筒棉質長褲', '經典修身直筒剪裁，專為亞洲身型設計，線條流暢俐落，能有效修飾腿型，展現簡約而不失品味的職人風格。', 1680.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856719/mole_drak_green_COTTON_STRAIGHT_LEG_TROUSERS_pfrc.png', '{"鼴鼠灰褐": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856725/mole_drak_green_COTTON_STRAIGHT_LEG_TROUSERS_pfrc_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856727/mole_drak_green_COTTON_STRAIGHT_LEG_TROUSERS_pfrc_Back.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856730/mole_drak_green_COTTON_STRAIGHT_LEG_TROUSERS_pfrc_Detail.png"], "深棕色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856722/mole_drak_green_COTTON_STRAIGHT_LEG_TROUSERS_pfrc_dark_brown.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+-- 新增 Coat (category_id = 3)
+(3, '圍巾絎縫內襯夾克', '融合經典絎縫工藝與現代設計語言，內襯採用精緻絎縫棉面料，提供輕盈保暖效果，搭配可拆卸圍巾設計，兼具機能性與時尚感。', 3980.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856732/mole_drak_green_SCARF_DETAIL_QUILTED_LINER_JACKET_jehr.png', '{"莫蘭迪綠": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856746/mole_drak_green_SCARF_DETAIL_QUILTED_LINER_JACKET_jehr_%E8%8E%AB%E8%98%AD%E8%BF%AA%E7%B6%A0.png"], "淺橘色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766856748/mole_drak_green_SCARF_DETAIL_QUILTED_LINER_JACKET_jehr_%E6%B7%BA%E6%A9%98%E8%89%B2.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+-- 新增 Accessories (category_id = 4)
+(4, '格紋羊駝毛圍巾', '經典英倫格紋設計，採用沉穩的酒紅與炭灰撞色大格紋，風格簡約大方，展現低調奢華的視覺張力。羊駝毛混紡材質，輕盈保暖，觸感柔軟細緻。', 1280.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858617/Burgundy_Checked_CHECKED_ALPACA_BLEND_SCARF_zaas.png', '{"酒紅格紋": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858619/Burgundy_Checked_CHECKED_ALPACA_BLEND_SCARF_zaas_Detail.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(4, '雕塑托特包', '結合極簡主義與現代幾何美學的托特包，採用獨特的俐落線條與幾何造型，完美平衡現代感與簡約美學。麂皮材質，展現低調奢華的氣息。', 2680.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858625/Burgundy_Brown_SCULPTED_TOTE_BAG_SUEDE_fnbz.png', '{"酒紅棕": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858627/Burgundy_Brown_SCULPTED_TOTE_BAG_SUEDE_fnbz_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858630/Burgundy_Brown_SCULPTED_TOTE_BAG_SUEDE_fnbz_Detail.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+-- 新增 Coat (category_id = 3)
+(3, '雙面羊毛青果領大衣', '優雅青果領設計，獨特的深棕色青果領與海軍藍衣身形成鮮明的色彩對比，為簡約的設計注入高級層次感，展現低調而奢華的紳士魅力。', 6980.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858636/Dark_Brown_DOUBLE_FACED_WOOL_SHAWL_COLLAR_COAT_0nyq.png', '{"深棕海軍藍": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858640/Dark_Brown_DOUBLE_FACED_WOOL_SHAWL_COLLAR_COAT_0nyq_Back.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858643/Dark_Brown_DOUBLE_FACED_WOOL_SHAWL_COLLAR_COAT_0nyq_Detail.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+-- 新增 Accessories (category_id = 4)
+(4, '麂皮斜背包', '簡約俐落的長方形輪廓設計，展現現代摩登氣息，無論日常通勤或休閒約會皆能完美適配。高品質麂皮材質，觸感細膩柔軟。', 1880.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858648/Chocolate_TROVE_CROSSBODY_BAG_SUEDE_ewv0.png', '{"巧克力色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858649/Chocolate_TROVE_CROSSBODY_BAG_SUEDE_ewv0_Back.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766858652/Chocolate_TROVE_CROSSBODY_BAG_SUEDE_ewv0_Detail.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+-- 新增 Top (category_id = 1)
+(1, '寬鬆棉質T恤', '採用時下流行的 Oversize 廓形與落肩設計，不僅修飾身型，更能輕鬆打造隨興且具層次感的潮流街頭風格。優質棉質面料，柔軟透氣。', 680.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860665/OVERSIZED_COTTON_T_SHIRT_a2ir.png', '{"白色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860675/OVERSIZED_COTTON_T_SHIRT_a2ir_Back.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860677/OVERSIZED_COTTON_T_SHIRT_a2ir_Detail.png"], "莫蘭迪綠": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860668/OVERSIZED_COTTON_T_SHIRT_a2ir_%E8%8E%AB%E8%98%AD%E8%BF%AA%E7%B6%A0.png"], "春天黃": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860670/OVERSIZED_COTTON_T_SHIRT_a2ir_%E6%98%A5%E5%A4%A9%E9%BB%83.png"], "月亮橘": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860672/OVERSIZED_COTTON_T_SHIRT_a2ir_%E6%9C%88%E4%BA%AE%E6%A9%98.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(1, '寬鬆棉質羅紋長袖T恤', '採用獨特的華夫格面料，細密的立體紋理賦予衣物豐富的觸感與視覺層次，兼具透氣性與保暖度。寬鬆版型，舒適百搭。', 880.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860679/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt.png', '{"黑色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860689/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_Side.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860691/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_Back.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860693/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_Detail.png"], "莫蘭迪綠": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860681/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_%E8%8E%AB%E8%98%AD%E8%BF%AA%E7%B6%A0.png"], "秋天褐色": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860683/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_%E7%A7%8B%E5%A4%A9%E8%A4%90%E8%89%B2.png"], "冬天灰白": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860685/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_%E5%86%AC%E5%A4%A9%E7%81%B0%E7%99%BD.png"], "淺酒紅": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1766860688/%E5%AF%AC%E9%AC%86%E6%A3%89%E8%B3%AA%E7%BE%85%E7%B4%8B%E9%95%B7%E8%A2%96T%E6%81%A4_3o0bt_%E6%B7%BA%E9%85%92%E7%B4%85.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 INSERT INTO product_variants (product_id, sku_code, color, size, stock, created_at) VALUES
 -- 商品1: 修身羊毛針織高領上衣 (莫蘭迪綠、酒紅色、灰色)
@@ -286,7 +300,7 @@ INSERT INTO product_variants (product_id, sku_code, color, size, stock, created_
 (13, 'P13-QHU-M-006', '淺灰', 'M', 6, DATE_SUB(NOW(), INTERVAL 8 DAY)),
 (13, 'P13-QHU-L-007', '淺灰', 'L', 5, DATE_SUB(NOW(), INTERVAL 8 DAY)),
 (13, 'P13-QHU-XL-008', '淺灰', 'XL', 3, DATE_SUB(NOW(), INTERVAL 8 DAY)),
--- 商品14: 衿切替長版大衣 (黑色、深橘色)
+-- 商品14: 復古工裝長版大衣 (黑色、深橘色)
 (14, 'P14-HEI-S-001', '黑色', 'S', 4, DATE_SUB(NOW(), INTERVAL 7 DAY)),
 (14, 'P14-HEI-M-002', '黑色', 'M', 6, DATE_SUB(NOW(), INTERVAL 7 DAY)),
 (14, 'P14-HEI-L-003', '黑色', 'L', 5, DATE_SUB(NOW(), INTERVAL 7 DAY)),
@@ -294,7 +308,74 @@ INSERT INTO product_variants (product_id, sku_code, color, size, stock, created_
 (14, 'P14-SJS-S-005', '深橘色', 'S', 3, DATE_SUB(NOW(), INTERVAL 7 DAY)),
 (14, 'P14-SJS-M-006', '深橘色', 'M', 5, DATE_SUB(NOW(), INTERVAL 7 DAY)),
 (14, 'P14-SJS-L-007', '深橘色', 'L', 4, DATE_SUB(NOW(), INTERVAL 7 DAY)),
-(14, 'P14-SJS-XL-008', '深橘色', 'XL', 2, DATE_SUB(NOW(), INTERVAL 7 DAY));
+(14, 'P14-SJS-XL-008', '深橘色', 'XL', 2, DATE_SUB(NOW(), INTERVAL 7 DAY)),
+-- 商品15: 直筒棉質長褲 (鼴鼠灰褐、深棕色)
+(15, 'P15-MOL-S-001', '鼴鼠灰褐', 'S', 5, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-MOL-M-002', '鼴鼠灰褐', 'M', 7, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-MOL-L-003', '鼴鼠灰褐', 'L', 6, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-MOL-XL-004', '鼴鼠灰褐', 'XL', 4, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-DBR-S-005', '深棕色', 'S', 4, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-DBR-M-006', '深棕色', 'M', 6, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-DBR-L-007', '深棕色', 'L', 5, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(15, 'P15-DBR-XL-008', '深棕色', 'XL', 3, DATE_SUB(NOW(), INTERVAL 6 DAY)),
+-- 商品16: 圍巾細節絎縫內襯夾克 (莫蘭迪綠、淺橘色)
+(16, 'P16-MLD-S-001', '莫蘭迪綠', 'S', 3, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-MLD-M-006', '莫蘭迪綠', 'M', 5, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-MLD-L-007', '莫蘭迪綠', 'L', 4, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-MLD-XL-008', '莫蘭迪綠', 'XL', 2, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-QJS-S-009', '淺橘色', 'S', 3, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-QJS-M-010', '淺橘色', 'M', 5, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-QJS-L-011', '淺橘色', 'L', 4, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(16, 'P16-QJS-XL-012', '淺橘色', 'XL', 2, DATE_SUB(NOW(), INTERVAL 5 DAY)),
+-- 商品17: 格紋羊駝毛圍巾 (酒紅格紋) - ONE SIZE
+(17, 'P17-BGC-OS-001', '酒紅格紋', 'ONE SIZE', 15, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+-- 商品18: 雕塑托特包 (酒紅棕) - ONE SIZE
+(18, 'P18-BRB-OS-001', '酒紅棕', 'ONE SIZE', 10, DATE_SUB(NOW(), INTERVAL 4 DAY)),
+-- 商品19: 雙面羊毛青果領大衣 (深棕海軍藍)
+(19, 'P19-DBN-S-001', '深棕海軍藍', 'S', 3, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(19, 'P19-DBN-M-002', '深棕海軍藍', 'M', 5, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(19, 'P19-DBN-L-003', '深棕海軍藍', 'L', 4, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(19, 'P19-DBN-XL-004', '深棕海軍藍', 'XL', 2, DATE_SUB(NOW(), INTERVAL 3 DAY)),
+-- 商品20: 麂皮斜背包 (巧克力色) - ONE SIZE
+(20, 'P20-CHO-OS-001', '巧克力色', 'ONE SIZE', 12, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+-- 商品21: 寬鬆棉質T恤 (白色、莫蘭迪綠、春天黃、月亮橘)
+(21, 'P21-WHI-S-001', '白色', 'S', 10, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-WHI-M-002', '白色', 'M', 15, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-WHI-L-003', '白色', 'L', 12, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-WHI-XL-004', '白色', 'XL', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-MLD-S-005', '莫蘭迪綠', 'S', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-MLD-M-006', '莫蘭迪綠', 'M', 12, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-MLD-L-007', '莫蘭迪綠', 'L', 10, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-MLD-XL-008', '莫蘭迪綠', 'XL', 6, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-CTH-S-009', '春天黃', 'S', 6, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-CTH-M-010', '春天黃', 'M', 10, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-CTH-L-011', '春天黃', 'L', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-CTH-XL-012', '春天黃', 'XL', 5, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-YLJ-S-013', '月亮橘', 'S', 6, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-YLJ-M-014', '月亮橘', 'M', 10, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-YLJ-L-015', '月亮橘', 'L', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(21, 'P21-YLJ-XL-016', '月亮橘', 'XL', 5, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+-- 商品22: 寬鬆棉質羅紋長袖T恤 (黑色、莫蘭迪綠、秋天褐色、冬天灰白、淺酒紅)
+(22, 'P22-BLK-S-001', '黑色', 'S', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-BLK-M-002', '黑色', 'M', 12, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-BLK-L-003', '黑色', 'L', 10, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-BLK-XL-004', '黑色', 'XL', 6, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-MLD-S-005', '莫蘭迪綠', 'S', 6, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-MLD-M-006', '莫蘭迪綠', 'M', 10, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-MLD-L-007', '莫蘭迪綠', 'L', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-MLD-XL-008', '莫蘭迪綠', 'XL', 5, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QTS-S-009', '秋天褐色', 'S', 5, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QTS-M-010', '秋天褐色', 'M', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QTS-L-011', '秋天褐色', 'L', 7, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QTS-XL-012', '秋天褐色', 'XL', 4, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-DTH-S-013', '冬天灰白', 'S', 5, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-DTH-M-014', '冬天灰白', 'M', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-DTH-L-015', '冬天灰白', 'L', 7, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-DTH-XL-016', '冬天灰白', 'XL', 4, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QJH-S-017', '淺酒紅', 'S', 5, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QJH-M-018', '淺酒紅', 'M', 8, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QJH-L-019', '淺酒紅', 'L', 7, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(22, 'P22-QJH-XL-020', '淺酒紅', 'XL', 4, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
 INSERT INTO cart_items (user_id, variant_id, quantity, created_at) VALUES
 -- user 2: 修身羊毛針織高領上衣-莫蘭迪綠-M, 雪尼爾寬鬆高領針織衫-黑色-L, 精紡羊毛寬褲-深灰-M

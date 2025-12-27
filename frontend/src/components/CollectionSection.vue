@@ -107,7 +107,7 @@ const displayProducts = computed(() => {
       <!-- 商品列表 -->
       <div
         v-else-if="displayProducts.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20 animate-fade-in"
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16 animate-fade-in"
       >
         <ProductCard
           v-for="(product, index) in displayProducts"

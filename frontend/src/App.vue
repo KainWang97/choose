@@ -555,9 +555,14 @@ const handleForceLogout = () => {
 // ============================================
 // Inquiry Logic
 // ============================================
-const handleContactSubmit = async (name, email, message) => {
+const handleContactSubmit = async (name, email, subject, message) => {
   try {
-    const newInquiry = await api.inquiries.create({ name, email, message });
+    const newInquiry = await api.inquiries.create({
+      name,
+      email,
+      subject,
+      message,
+    });
     inquiries.value.unshift(newInquiry);
   } catch (error) {
     console.error("Failed to submit inquiry:", error);

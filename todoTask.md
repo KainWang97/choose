@@ -22,7 +22,7 @@
 - [x] 後端：擴充 Product Model 支援多圖片
 - [x] 後端：新增/修改 ProductDTO
 - [x] 前端：商品詳情頁圖片輪播
-- [x] 前端：縮圖列表切換
+- [x] 前端：縮圖列表切換（置中顯示）
 - [ ] Admin：多圖片上傳 UI (延後)
 
 **相關檔案**：`Product.java`, `ProductDTO.java`, `ProductDetail.vue`, `api.js`
@@ -60,15 +60,68 @@
 
 ---
 
-### 5. 🟡 管理面板回覆用戶信件
+### 5. ✅ 管理面板回覆用戶信件
 
-**困難度**：中 | **預估時間**：4-6 小時
+**困難度**：中 | **狀態**：已完成
 
-- [ ] 後端：新增回覆信件 API（使用 Gmail SMTP）
-- [ ] 前端：在 ContactMessages 管理區新增回覆輸入框
-- [ ] 後端：記錄回覆內容到資料庫
+- [x] 後端：新增回覆信件 API（使用 Gmail SMTP）
+- [x] 前端：在 ContactMessages 管理區新增回覆輸入框
+- [x] 後端：記錄回覆內容到資料庫
+- [x] 案件編號自動產生 (CS-XXXX 格式)
+- [x] 客服訊息搜尋功能 (案件編號/Email)
+- [x] 結案/重開功能
+- [x] 卡片展開/收合、放大狀態標籤
 
 **相關檔案**：`ContactMessageController.java`, `EmailService.java`, `AdminDashboard.vue`
+
+---
+
+### 6. ✅ 會員消費統計 Modal
+
+**困難度**：低 | **狀態**：已完成
+
+- [x] 後端：新增 MemberStatisticsService
+- [x] 後端：新增 MemberStatisticsDTO
+- [x] 前端：點擊會員顯示統計 Modal
+- [x] 顯示累計消費、平均客單價、訂單數量、首次/最近消費日期
+
+**相關檔案**：`MemberStatisticsService.java`, `AdminDashboard.vue`
+
+---
+
+### 7. ✅ 用戶疑問表單主題選擇
+
+**困難度**：低 | **狀態**：已完成
+
+- [x] 前端：新增主題下拉選單
+- [x] 選項：商品到貨、退換貨政策、顏色詢問、尺寸選擇、門市詢問、其他
+
+**相關檔案**：`ContactSection.vue`, `App.vue`
+
+---
+
+### 8. 🟢 商品資料擴充
+
+**困難度**：低 | **狀態**：進行中
+
+- [x] 商品列表排版調整 (一列 4 個商品)
+- [x] 新增商品資料至 22 個商品
+- [ ] 執行 `schema.sql` 更新資料庫
+
+**相關檔案**：`CollectionSection.vue`, `schema.sql`
+
+---
+
+### 9. 🟡 未來優化項目
+
+**困難度**：中-高 | **優先度**：低
+
+- [ ] **Cloudinary 架構優化**：改儲存 `public_id` 而非完整 URL
+- [ ] 回覆模板管理功能 (編輯/刪除模板)
+- [ ] 訂單批次操作功能
+- [ ] 資料匯出功能 (訂單/會員)
+- [ ] 郵件通知優化 (非同步、失敗處理)
+- [ ] 用戶端詢問歷史紀錄
 
 ---
 

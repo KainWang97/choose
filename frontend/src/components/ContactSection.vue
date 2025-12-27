@@ -24,17 +24,19 @@ watch(
     if (newVal) email.value = newVal;
   }
 );
+const subject = ref("");
 const message = ref("");
 const submitted = ref(false);
 
 const showToast = ref(false);
 
 const handleSubmit = () => {
-  emit("submit", name.value, email.value, message.value);
+  emit("submit", name.value, email.value, subject.value, message.value);
   submitted.value = true;
   // 等待送出狀態結束後再顯示提示
   setTimeout(() => {
     submitted.value = false;
+    subject.value = "";
     message.value = "";
     showToast.value = true;
     setTimeout(() => {
@@ -86,6 +88,25 @@ const handleSubmit = () => {
             v-model="email"
             class="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-sumi transition-colors rounded-none"
           />
+        </div>
+        <div>
+          <label
+            class="block text-xs uppercase tracking-widest text-stone-500 mb-2"
+            >Subject</label
+          >
+          <select
+            v-model="subject"
+            required
+            class="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-sumi transition-colors rounded-none appearance-none cursor-pointer"
+          >
+            <option value="" disabled>請選擇主題</option>
+            <option value="商品到貨詢問">商品到貨詢問</option>
+            <option value="退換貨政策">退換貨政策</option>
+            <option value="顏色詢問">顏色詢問</option>
+            <option value="尺寸選擇">尺寸選擇</option>
+            <option value="門市詢問">門市詢問</option>
+            <option value="其他">其他</option>
+          </select>
         </div>
         <div>
           <label

@@ -329,63 +329,71 @@
 │   ├── ApiResponse.java            # 統一回應封裝 {success, message, data}
 │   └── GlobalExceptionHandler.java # 全域例外處理 (8 種例外類型)
 │
-├── config/                         # 配置模組 (5 個)
+├── config/                         # 配置模組 (4 個)
 │   ├── CloudinaryConfig.java       # Cloudinary SDK 初始化
 │   ├── DataInitializer.java        # 啟動時建立預設 Admin (admin@choose.com / 123456)
 │   ├── PasswordConfig.java         # BCryptPasswordEncoder Bean
-│   ├── SecurityConfig.java         # Spring Security、CORS、JWT Filter 註冊
-│   └── WebConfig.java              # Spring MVC 擴充 (目前空，CORS 已移至 Security)
+│   └── SecurityConfig.java         # Spring Security、CORS、JWT Filter 註冊
 │
-├── controller/                     # 表現層 (9 個)
-│   ├── AuthController.java         # /api/auth - 註冊、登入、登出、JWT Cookie
+├── controller/                     # 表現層 (10 個)
+│   ├── AuthController.java         # /api/auth - 註冊、登入、登出、信箱驗證
 │   ├── CartController.java         # /api/cart - 購物車 CRUD
 │   ├── CategoryController.java     # /api/categories - 分類管理 (Admin)
-│   ├── InquiryController.java      # /api/inquiries - 客服留言
+│   ├── InquiryController.java      # /api/inquiries - 客服留言回覆、結案功能
 │   ├── OrderController.java        # /api/orders - 訂單建立、狀態更新
 │   ├── ProductController.java      # /api/products - 商品 CRUD、精選切換
 │   ├── ProductVariantController.java  # /api/variants - 規格 (SKU) 管理
+│   ├── ReplyTemplateController.java   # /api/reply-templates - 回覆模板管理
 │   ├── UploadController.java       # /api/upload - 圖片上傳至 Cloudinary
-│   └── UserController.java         # /api/users - 個資、密碼變更、帳號刪除
+│   └── UserController.java         # /api/users - 個資、密碼變更、帳號刪除、會員統計
 │
-├── dto/response/                   # 回應 DTO (6 個)
+├── dto/response/                   # 回應 DTO (7 個)
 │   ├── CartItemDTO.java
 │   ├── CategoryDTO.java
-│   ├── InquiryDTO.java
+│   ├── InquiryDTO.java             # 含 caseNumber、adminReply、subject
+│   ├── MemberStatisticsDTO.java    # 會員消費統計 (累計消費、訂單數、平均客單價)
 │   ├── OrderDTO.java               # 含巢狀 OrderItemDTO
 │   ├── ProductDTO.java             # 11 欄位，含 categoryId、聚合庫存
 │   └── ProductVariantDTO.java
 │
-├── model/                          # 領域實體 (8 個 POJO)
+├── model/                          # 領域實體 (10 個 POJO)
 │   ├── CartItem.java
 │   ├── Category.java
-│   ├── ContactMessage.java
+│   ├── ContactMessage.java         # 含 caseNumber、subject、status (PENDING/REPLIED_TRACKING/CLOSED)
 │   ├── Order.java                  # Enum: PENDING/PAID/SHIPPED/COMPLETED/CANCELLED
 │   ├── OrderItem.java
-│   ├── Product.java                # 3 索引、orphanRemoval
+│   ├── Product.java                # 3 索引、orphanRemoval、colorImages (JSON)
 │   ├── ProductVariant.java         # UniqueConstraint(product,color,size)、stock 索引
-│   └── User.java                   # Enum: MEMBER/ADMIN、軟刪除
+│   ├── ReplyTemplate.java          # 回覆模板 (name, content)
+│   ├── User.java                   # Enum: MEMBER/ADMIN、emailVerified、軟刪除
+│   └── VerificationToken.java      # 信箱驗證 Token (EMAIL_VERIFY/PASSWORD_RESET/LOGIN_LINK)
 │
-├── repository/                     # 持久層 (7 個)
+├── repository/                     # 持久層 (9 個)
 │   ├── CartItemRepository.java     # deleteByUserUserId()
 │   ├── CategoryRepository.java     # existsByName()
-│   ├── ContactMessageRepository.java
-│   ├── OrderRepository.java        # 5 方法，含 existsByUserUserIdAndStatusIn()
+│   ├── ContactMessageRepository.java  # existsByCaseNumber()
+│   ├── OrderRepository.java        # 會員統計查詢 (sumCompletedAmount, countCompleted)
 │   ├── ProductRepository.java      # 5 方法，含 JPQL searchProducts()
 │   ├── ProductVariantRepository.java  # findByProductProductId()
-│   └── UserRepository.java         # findByEmail(), existsByEmail()
+│   ├── ReplyTemplateRepository.java
+│   ├── UserRepository.java         # findByEmail(), existsByEmail()
+│   └── VerificationTokenRepository.java # findByToken(), deleteByUserUserId()
 │
 ├── security/                       # 安全模組 (2 個)
 │   ├── JwtAuthenticationFilter.java  # 雙路徑 Token 提取 (Cookie / Header)
 │   └── JwtUtil.java                # HMAC-SHA256 簽章、Claims 解析
 │
-└── service/                        # 業務層 (7 個)
+└── service/                        # 業務層 (10 個)
     ├── CartService.java            # 庫存檢查、數量合併
     ├── CategoryService.java
-    ├── ContactMessageService.java  # markAsRead(), markAsReplied(), markAsUnreplied()
+    ├── ContactMessageService.java  # 回覆信件、結案/重開、案件編號產生
+    ├── EmailService.java           # Gmail SMTP 發送 (驗證信、回覆通知)
     ├── ImageUploadService.java     # Cloudinary upload (限 jpg/png/gif/webp)
+    ├── MemberStatisticsService.java # 會員消費統計計算
     ├── OrderService.java           # @Transactional 原子化下單、庫存扣減
     ├── ProductService.java         # SKU 生成、精選上限 8 件
-    └── UserService.java            # BCrypt 加密、軟刪除去識別化
+    ├── ReplyTemplateService.java   # 回覆模板 CRUD
+    └── UserService.java            # BCrypt 加密、信箱驗證、軟刪除去識別化
 </code></pre>
 
         <hr />
@@ -481,7 +489,7 @@
 
         <h2>3. 各層技術實作深度解析</h2>
 
-        <h3 id="sec-controller">3.1 Controller 層 (表現層) - 9 個控制器</h3>
+        <h3 id="sec-controller">3.1 Controller 層 (表現層) - 10 個控制器</h3>
         <p>
           <strong>職責</strong>：接收 HTTP 請求、Bean Validation、調用
           Service、組裝 ApiResponse。<strong>禁止包含業務邏輯</strong>。
@@ -577,7 +585,7 @@
           個私有）、InquiryController 有 7 個（含 1 個私有）。
         </p>
 
-        <h3 id="sec-service">3.2 Service 層 (業務邏輯層) - 7 個服務</h3>
+        <h3 id="sec-service">3.2 Service 層 (業務邏輯層) - 10 個服務</h3>
         <p>
           <strong>職責</strong>：封裝業務規則、<code>@Transactional</code>
           交易管理、跨 Repository 協調。
@@ -646,7 +654,7 @@
         </table>
 
         <h3 id="sec-repository">
-          3.3 Repository 層 (持久層) - 7 個 Repository
+          3.3 Repository 層 (持久層) - 9 個 Repository
         </h3>
         <table>
           <thead>
@@ -689,7 +697,7 @@
           </tbody>
         </table>
 
-        <h3 id="sec-model">3.4 Model 層 (領域實體) - 8 個 POJO</h3>
+        <h3 id="sec-model">3.4 Model 層 (領域實體) - 10 個 POJO</h3>
         <table>
           <thead>
             <tr>
