@@ -19,7 +19,12 @@ const router = useRouter();
 const route = useRoute();
 
 // Confirm Modal
-const { state: confirmState, handleConfirm, handleCancel } = useConfirm();
+const {
+  state: confirmState,
+  confirm,
+  handleConfirm,
+  handleCancel,
+} = useConfirm();
 
 // Toast Notification
 const { toast } = useToast();
@@ -107,6 +112,39 @@ onMounted(async () => {
           // 載入會員購物車
           const cartData = await api.cart.getAll();
           cart.value = cartData;
+
+          // 檢查並還原 pendingCart（註冊驗證後保留的購物車）
+          const pendingCartJson = localStorage.getItem("pendingCart");
+          if (pendingCartJson) {
+            try {
+              const pendingCart = JSON.parse(pendingCartJson);
+              localStorage.removeItem("pendingCart"); // 清除 localStorage
+
+              if (pendingCart && pendingCart.length > 0) {
+                // 取得資料庫購物車中已存在的 variant IDs
+                const existingVariantIds = new Set(
+                  cart.value.map((item) => item.variant?.id)
+                );
+
+                // 將 pendingCart 中不存在於資料庫的商品加入
+                for (const item of pendingCart) {
+                  if (
+                    item.variant?.id &&
+                    !existingVariantIds.has(item.variant.id)
+                  ) {
+                    await api.cart.add(item.variant.id, item.quantity || 1);
+                  }
+                }
+
+                // 重新載入合併後的購物車
+                const mergedCart = await api.cart.getAll();
+                cart.value = mergedCart;
+              }
+            } catch (e) {
+              console.error("Failed to restore pendingCart:", e);
+              localStorage.removeItem("pendingCart");
+            }
+          }
         }
       } catch (error) {
         console.error("Failed to load user data:", error);
@@ -348,6 +386,27 @@ const handleCheckoutStart = () => {
 };
 
 const handlePlaceOrder = async (shippingDetails) => {
+  // 檢查信箱是否已驗證
+  if (!user.value?.emailVerified) {
+    const confirmed = await confirm({
+      title: "信箱尚未驗證",
+      message: "請先驗證您的信箱後才能結帳下單。\n\n是否重新發送驗證信？",
+      confirmText: "發送驗證信",
+      cancelText: "返回",
+      variant: "warning",
+    });
+
+    if (confirmed) {
+      try {
+        await api.auth.resendVerification();
+        toast.success("驗證信已發送，請查收您的信箱");
+      } catch (error) {
+        toast.error("發送失敗，請稍後再試");
+      }
+    }
+    return;
+  }
+
   try {
     const newOrder = await api.orders.create({
       items: cart.value,
@@ -748,6 +807,12 @@ provide("newArrivalsProducts", newArrivalsProducts);
 provide("cart", cart);
 provide("user", user);
 
+// 提供 setUser 函數讓驗證頁面可以更新全局登入狀態
+const setUser = (newUser) => {
+  user.value = newUser;
+};
+provide("setUser", setUser);
+
 provide("handleProductClick", handleProductClick);
 provide("handleAddToCart", handleAddToCart);
 provide("handleContactSubmit", handleContactSubmit);
@@ -803,6 +868,7 @@ const hideFooter = computed(() => route.path.startsWith("/admin"));
     <!-- Overlays -->
     <AuthModal
       :isOpen="isAuthOpen"
+      :redirect="postLoginRedirect"
       @close="handleAuthClose"
       @login="handleLogin"
     />

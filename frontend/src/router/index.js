@@ -70,6 +70,30 @@ const routes = [
     meta: { title: "隱私權政策 - Choose" },
   },
   {
+    path: "/verify-email",
+    name: "verify-email",
+    component: () => import("../views/EmailVerificationView.vue"),
+    meta: { title: "信箱驗證 - Choose" },
+  },
+  {
+    path: "/login-verify",
+    name: "login-verify",
+    component: () => import("../views/LoginVerifyView.vue"),
+    meta: { title: "登入驗證 - Choose" },
+  },
+  {
+    path: "/forgot-password",
+    name: "forgot-password",
+    component: () => import("../views/ForgotPasswordView.vue"),
+    meta: { title: "忘記密碼 - Choose" },
+  },
+  {
+    path: "/reset-password",
+    name: "reset-password",
+    component: () => import("../views/ResetPasswordView.vue"),
+    meta: { title: "重設密碼 - Choose" },
+  },
+  {
     path: "/admin",
     name: "admin",
     component: AdminView,

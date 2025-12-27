@@ -43,19 +43,32 @@
 
 ---
 
-### 4. 🔴 信箱驗證（註冊 + 更改密碼）
+### 4. ✅ 信箱驗證（註冊 + 更改密碼）
 
-**困難度**：高 | **預估時間**：12-16 小時
+**困難度**：高 | **狀態**：已完成
 
-- [ ] 後端：配置 SMTP 服務
-- [ ] 後端：新增 EmailService
-- [ ] 後端：新增 VerificationToken 資料表
-- [ ] 後端：修改註冊流程（發送驗證信）
-- [ ] 後端：修改更改密碼流程
-- [ ] 前端：驗證成功/失敗頁面
-- [ ] 前端：重發驗證信按鈕
+- [x] 後端：配置 SMTP 服務 (Gmail)
+- [x] 後端：新增 EmailService
+- [x] 後端：新增 VerificationToken 資料表
+- [x] 後端：修改註冊流程（發送驗證信）
+- [x] 後端：新增忘記密碼 / 重設密碼流程
+- [x] 前端：驗證成功/失敗頁面
+- [x] 前端：忘記密碼 / 重設密碼頁面
+- [x] 前端：結帳時檢查信箱驗證狀態
 
-**相關檔案**：`AuthController.java`, `UserService.java`, 新增 `EmailService.java`, `VerificationToken.java`
+**相關檔案**：`AuthController.java`, `UserService.java`, `EmailService.java`, `VerificationToken.java`, `EmailVerificationView.vue`, `ForgotPasswordView.vue`, `ResetPasswordView.vue`
+
+---
+
+### 5. 🟡 管理面板回覆用戶信件
+
+**困難度**：中 | **預估時間**：4-6 小時
+
+- [ ] 後端：新增回覆信件 API（使用 Gmail SMTP）
+- [ ] 前端：在 ContactMessages 管理區新增回覆輸入框
+- [ ] 後端：記錄回覆內容到資料庫
+
+**相關檔案**：`ContactMessageController.java`, `EmailService.java`, `AdminDashboard.vue`
 
 ---
 

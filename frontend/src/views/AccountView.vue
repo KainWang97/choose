@@ -5,7 +5,7 @@
  */
 import { ref, inject, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import { userApi } from "../services/api.js";
+import { userApi, authApi } from "../services/api.js";
 import { useConfirm } from "../composables/useConfirm.js";
 
 const router = useRouter();
@@ -174,11 +174,23 @@ const handleChangePassword = async () => {
 
   isChangingPassword.value = true;
   try {
-    await userApi.changePassword(
-      passwordForm.value.currentPassword,
-      passwordForm.value.newPassword
-    );
-    passwordSuccess.value = "密碼更改成功";
+    // 根據 passwordSet 狀態決定使用哪個 API
+    if (user.value?.passwordSet) {
+      // 已設定密碼，使用更改密碼 API（需要舊密碼）
+      await userApi.changePassword(
+        passwordForm.value.currentPassword,
+        passwordForm.value.newPassword
+      );
+      passwordSuccess.value = "密碼更改成功";
+    } else {
+      // 首次設定密碼，使用設定密碼 API（不需要舊密碼）
+      await authApi.setPassword(passwordForm.value.newPassword);
+      passwordSuccess.value = "密碼設定成功";
+      // 更新用戶狀態
+      if (user.value) {
+        user.value = { ...user.value, passwordSet: true };
+      }
+    }
     // 清空表單
     passwordForm.value = {
       currentPassword: "",
@@ -186,7 +198,7 @@ const handleChangePassword = async () => {
       confirmPassword: "",
     };
   } catch (error) {
-    passwordError.value = error.message || "密碼更改失敗，請稍後再試";
+    passwordError.value = error.message || "操作失敗，請稍後再試";
   } finally {
     isChangingPassword.value = false;
   }
@@ -523,15 +535,27 @@ const handleChangePassword = async () => {
           </div>
         </div>
 
-        <!-- 更改密碼 -->
+        <!-- 密碼設定 / 更改密碼 -->
         <div class="space-y-4">
           <h2
             class="text-sm uppercase tracking-widest text-stone-500 border-b border-stone-200 pb-2"
           >
-            更改密碼
+            {{ user?.passwordSet ? "更改密碼" : "設定密碼" }}
           </h2>
+
+          <!-- 未設定密碼提示 -->
+          <div
+            v-if="!user?.passwordSet"
+            class="bg-amber-50 border border-amber-200 p-4 rounded-sm"
+          >
+            <p class="text-sm text-amber-800">
+              您尚未設定密碼。設定密碼後可使用密碼快速登入。
+            </p>
+          </div>
+
           <form @submit.prevent="handleChangePassword" class="space-y-4">
-            <div>
+            <!-- 目前密碼（僅已設定密碼的用戶需要） -->
+            <div v-if="user?.passwordSet">
               <label
                 class="block text-xs uppercase tracking-widest text-stone-500 mb-2"
               >
@@ -738,7 +762,13 @@ const handleChangePassword = async () => {
                 v-if="isChangingPassword"
                 class="inline-block w-4 h-4 border-2 border-washi border-t-transparent rounded-full animate-spin"
               ></span>
-              {{ isChangingPassword ? "更新中..." : "更改密碼" }}
+              {{
+                isChangingPassword
+                  ? "更新中..."
+                  : user?.passwordSet
+                  ? "更改密碼"
+                  : "設定密碼"
+              }}
             </button>
           </form>
         </div>

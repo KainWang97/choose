@@ -34,6 +34,12 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role = Role.MEMBER;
 
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
+    @Column(name = "password_set", nullable = false)
+    private Boolean passwordSet = false;
+
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 

@@ -174,6 +174,8 @@ function transformUser(backend) {
     name: backend.name,
     phone: backend.phone,
     role: backend.role === "ADMIN" ? "ADMIN" : "MEMBER",
+    emailVerified: backend.emailVerified ?? false,
+    passwordSet: backend.passwordSet ?? false,
     orders: [],
   };
 }
@@ -700,18 +702,14 @@ export const authApi = {
   },
 
   /**
-   * 註冊新會員
+   * 註冊新會員（無密碼，需驗證信箱）
    * POST /api/auth/register
-   * @param {{ name: string; email: string; password: string; phone?: string }} data
-   * @returns {Promise<import('../types.js').User>}
+   * @param {{ name: string; email: string }} data
+   * @returns {Promise<void>}
    */
   async register(data) {
-    const backend = await apiPost("/auth/register", data);
-    // 儲存 Token 到 localStorage
-    if (backend.token) {
-      tokenManager.setToken(backend.token);
-    }
-    return transformUser(backend);
+    await apiPost("/auth/register", data);
+    // 不再返回 user，需透過信箱驗證後自動登入
   },
 
   /**
@@ -738,6 +736,97 @@ export const authApi = {
     tokenManager.removeToken();
     // 後端會清除 HttpOnly Cookie
     await apiPost("/auth/logout");
+  },
+
+  /**
+   * 驗證信箱（返回用戶資訊以自動登入）
+   * POST /api/auth/verify-email
+   * @param {string} token
+   * @returns {Promise<{user: import('../types.js').User, token: string} | null>}
+   */
+  async verifyEmail(token) {
+    const response = await apiPost("/auth/verify-email", { token });
+    if (response && response.token) {
+      tokenManager.setToken(response.token);
+      return {
+        user: transformUser(response),
+        token: response.token,
+      };
+    }
+    return null;
+  },
+
+  /**
+   * 重新發送驗證信
+   * POST /api/auth/resend-verification
+   * @returns {Promise<void>}
+   */
+  async resendVerification() {
+    await apiPost("/auth/resend-verification");
+  },
+
+  /**
+   * 忘記密碼
+   * POST /api/auth/forgot-password
+   * @param {string} email
+   * @returns {Promise<void>}
+   */
+  async forgotPassword(email) {
+    await apiPost("/auth/forgot-password", { email });
+  },
+
+  /**
+   * 重設密碼
+   * POST /api/auth/reset-password
+   * @param {string} token
+   * @param {string} newPassword
+   * @returns {Promise<void>}
+   */
+  async resetPassword(token, newPassword) {
+    await apiPost("/auth/reset-password", { token, newPassword });
+  },
+
+  /**
+   * Magic Link 登入（發送登入驗證信）
+   * POST /api/auth/login-magic
+   * @param {string} email
+   * @returns {Promise<void>}
+   */
+  async loginMagic(email) {
+    await apiPost("/auth/login-magic", { email });
+  },
+
+  /**
+   * Magic Link 登入驗證
+   * POST /api/auth/login-verify
+   * @param {string} token
+   * @returns {Promise<{user: import('../types.js').User, token: string} | null>}
+   */
+  async loginVerify(token) {
+    const response = await apiPost("/auth/login-verify", { token });
+    if (response && response.token) {
+      tokenManager.setToken(response.token);
+      return {
+        user: transformUser(response),
+        token: response.token,
+      };
+    }
+    return null;
+  },
+
+  /**
+   * 初次設定密碼（已登入用戶，token 為可選）
+   * POST /api/auth/set-password
+   * @param {string} newPassword - 新密碼
+   * @param {string} [token] - 可選的驗證 token
+   * @returns {Promise<void>}
+   */
+  async setPassword(newPassword, token = null) {
+    const body = { newPassword };
+    if (token) {
+      body.token = token;
+    }
+    await apiPost("/auth/set-password", body);
   },
 };
 

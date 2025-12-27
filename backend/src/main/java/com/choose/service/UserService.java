@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,42 @@ public class UserService {
         User saved = userRepository.save(user);
         
         log.info("User registered successfully: userId={}, email={}", saved.getUserId(), saved.getEmail());
+        return saved;
+    }
+
+    /**
+     * 產生 20 位亂數密碼（英數混合）
+     */
+    public String generateRandomPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(20);
+        for (int i = 0; i < 20; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 簡化註冊（不需密碼，系統自動產生）
+     */
+    @Transactional
+    public User registerSimple(String email, String name) {
+        log.info("Simple registration: email={}", email);
+        
+        if (userRepository.existsByEmail(email)) {
+            log.warn("Registration failed: Email already exists, email={}", email);
+            throw new IllegalArgumentException("Email already exists");
+        }
+        
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        user.setPassword(passwordEncoder.encode(generateRandomPassword()));
+        user.setEmailVerified(false);
+        
+        User saved = userRepository.save(user);
+        log.info("User registered (simple) successfully: userId={}, email={}", saved.getUserId(), saved.getEmail());
         return saved;
     }
 
@@ -102,6 +139,62 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         log.info("Password changed successfully for userId={}", userId);
+    }
+
+    /**
+     * 驗證信箱
+     */
+    @Transactional
+    public void verifyEmail(Long userId) {
+        log.info("Verifying email for userId={}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        log.info("Email verified for userId={}", userId);
+    }
+
+    /**
+     * 重設密碼（無需驗證舊密碼，用於忘記密碼流程）
+     */
+    @Transactional
+    public void resetPassword(Long userId, String newPassword) {
+        log.info("Resetting password for userId={}", userId);
+        
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new IllegalArgumentException("密碼長度至少需要 6 個字元");
+        }
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordSet(true);
+        userRepository.save(user);
+        log.info("Password reset successfully for userId={}", userId);
+    }
+
+    /**
+     * 初次設定密碼（新用戶）
+     */
+    @Transactional
+    public void setPassword(Long userId, String newPassword) {
+        log.info("Setting password for first time: userId={}", userId);
+        
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new IllegalArgumentException("密碼長度至少需要 6 個字元");
+        }
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        if (user.getPasswordSet()) {
+            throw new IllegalArgumentException("您已設定過密碼");
+        }
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordSet(true);
+        userRepository.save(user);
+        log.info("Password set successfully for userId={}", userId);
     }
 
     /**
