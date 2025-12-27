@@ -1,8 +1,10 @@
 package com.choose.controller;
 
 import com.choose.common.ApiResponse;
+import com.choose.dto.response.MemberStatisticsDTO;
 import com.choose.model.User;
 import com.choose.service.CartService;
+import com.choose.service.MemberStatisticsService;
 import com.choose.service.OrderService;
 import com.choose.service.UserService;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ public class UserController {
     private final UserService userService;
     private final OrderService orderService;
     private final CartService cartService;
+    private final MemberStatisticsService memberStatisticsService;
     /**
      * Get current user's profile
      */
@@ -75,6 +78,16 @@ public class UserController {
         return userService.findById(userId)
                 .map(u -> ResponseEntity.ok(ApiResponse.success(new UserProfileResponse(u))))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Admin: Get member statistics
+     */
+    @GetMapping("/{userId}/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MemberStatisticsDTO>> getMemberStatistics(@PathVariable Long userId) {
+        MemberStatisticsDTO stats = memberStatisticsService.getMemberStatistics(userId);
+        return ResponseEntity.ok(ApiResponse.success(stats));
     }
 
     @Data
