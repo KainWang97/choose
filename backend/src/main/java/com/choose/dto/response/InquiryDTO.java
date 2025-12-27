@@ -13,10 +13,14 @@ import java.util.List;
 @Data
 public class InquiryDTO {
     private Long id;
+    private String caseNumber;
     private String name;
     private String email;
+    private String subject;
     private String message;
     private String status;
+    private String adminReply;
+    private Long adminReplyBy;
     private LocalDateTime createdAt;
     private LocalDateTime repliedAt;
     private Long userId;
@@ -24,10 +28,14 @@ public class InquiryDTO {
     public static InquiryDTO fromEntity(ContactMessage message) {
         InquiryDTO dto = new InquiryDTO();
         dto.setId(message.getMessageId());
+        dto.setCaseNumber(message.getCaseNumber());
         dto.setName(message.getName());
         dto.setEmail(message.getEmail());
+        dto.setSubject(message.getSubject());
         dto.setMessage(message.getMessage());
         dto.setStatus(message.getStatus().name());
+        dto.setAdminReply(message.getAdminReply());
+        dto.setAdminReplyBy(message.getAdminReplyBy());
         dto.setCreatedAt(message.getCreatedAt());
         dto.setRepliedAt(message.getRepliedAt());
         
@@ -44,4 +52,3 @@ public class InquiryDTO {
                 .toList();
     }
 }
-

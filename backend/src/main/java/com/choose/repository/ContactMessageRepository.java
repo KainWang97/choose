@@ -11,5 +11,6 @@ public interface ContactMessageRepository extends JpaRepository<ContactMessage, 
     List<ContactMessage> findAllByOrderByCreatedAtDesc();
     List<ContactMessage> findByStatus(ContactMessage.MessageStatus status);
     List<ContactMessage> findByUserUserId(Long userId);
+    boolean existsByCaseNumber(String caseNumber);
 }
 

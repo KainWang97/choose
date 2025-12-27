@@ -184,4 +184,32 @@ public class EmailService {
         tokenRepository.deleteExpiredTokens(LocalDateTime.now());
         log.info("Expired tokens cleaned up");
     }
+
+    /**
+     * 發送客服回覆郵件給用戶
+     */
+    public void sendInquiryReplyEmail(com.choose.model.ContactMessage inquiry) {
+        log.info("Sending inquiry reply email to: {}", inquiry.getEmail());
+        
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(inquiry.getEmail());
+        message.setSubject("[Choose] 您的詢問已回覆");
+        
+        String subjectLine = inquiry.getSubject() != null 
+            ? "【主題】" + inquiry.getSubject() + "\n\n"
+            : "";
+        
+        message.setText(
+            "親愛的 " + inquiry.getName() + "，\n\n" +
+            "感謝您的來信，以下是您的詢問與我們的回覆：\n\n" +
+            subjectLine +
+            "【您的問題】\n" + inquiry.getMessage() + "\n\n" +
+            "【客服回覆】\n" + inquiry.getAdminReply() + "\n\n" +
+            "如有任何疑問，歡迎再次與我們聯繫。\n\n" +
+            "Choose 團隊"
+        );
+        
+        mailSender.send(message);
+        log.info("Inquiry reply email sent successfully to: {}", inquiry.getEmail());
+    }
 }

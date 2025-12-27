@@ -49,6 +49,7 @@ public class InquiryController {
         ContactMessage message = new ContactMessage();
         message.setName(request.getName());
         message.setEmail(request.getEmail());
+        message.setSubject(request.getSubject());
         message.setMessage(request.getMessage());
         
         String ipAddress = getClientIpAddress(httpRequest);
@@ -57,25 +58,28 @@ public class InquiryController {
         return ResponseEntity.ok(ApiResponse.success("Inquiry submitted successfully", InquiryDTO.fromEntity(created)));
     }
 
-    @PatchMapping("/{messageId}/read")
+    /**
+     * 回覆客服訊息（含發送 Email 給用戶）
+     */
+    @PostMapping("/{messageId}/reply")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<InquiryDTO>> markAsRead(@PathVariable Long messageId) {
-        ContactMessage message = contactMessageService.markAsRead(messageId);
-        return ResponseEntity.ok(ApiResponse.success("Marked as read", InquiryDTO.fromEntity(message)));
+    public ResponseEntity<ApiResponse<InquiryDTO>> replyInquiry(
+            @PathVariable Long messageId,
+            @Valid @RequestBody ReplyRequest request,
+            @AuthenticationPrincipal User admin) {
+        ContactMessage message = contactMessageService.replyMessage(
+                messageId, request.getReplyContent(), admin.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("已回覆並發送 Email", InquiryDTO.fromEntity(message)));
     }
 
-    @PatchMapping("/{messageId}/reply")
+    /**
+     * 結案客服訊息
+     */
+    @PatchMapping("/{messageId}/close")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<InquiryDTO>> markAsReplied(@PathVariable Long messageId) {
-        ContactMessage message = contactMessageService.markAsReplied(messageId);
-        return ResponseEntity.ok(ApiResponse.success("Marked as replied", InquiryDTO.fromEntity(message)));
-    }
-
-    @PatchMapping("/{messageId}/unreply")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<InquiryDTO>> markAsUnreplied(@PathVariable Long messageId) {
-        ContactMessage message = contactMessageService.markAsUnreplied(messageId);
-        return ResponseEntity.ok(ApiResponse.success("Marked as unreplied", InquiryDTO.fromEntity(message)));
+    public ResponseEntity<ApiResponse<InquiryDTO>> closeInquiry(@PathVariable Long messageId) {
+        ContactMessage message = contactMessageService.closeInquiry(messageId);
+        return ResponseEntity.ok(ApiResponse.success("已結案", InquiryDTO.fromEntity(message)));
     }
 
     @DeleteMapping("/{messageId}")
@@ -83,6 +87,13 @@ public class InquiryController {
     public ResponseEntity<ApiResponse<Void>> deleteInquiry(@PathVariable Long messageId) {
         contactMessageService.deleteMessage(messageId);
         return ResponseEntity.ok(ApiResponse.success("Inquiry deleted successfully", null));
+    }
+
+    @PatchMapping("/{messageId}/reopen")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<InquiryDTO>> reopenInquiry(@PathVariable Long messageId) {
+        ContactMessage updated = contactMessageService.reopenInquiry(messageId);
+        return ResponseEntity.ok(ApiResponse.success("已重新開啟案件", InquiryDTO.fromEntity(updated)));
     }
 
     private String getClientIpAddress(HttpServletRequest request) {
@@ -102,8 +113,15 @@ public class InquiryController {
         @Email
         private String email;
         
+        private String subject;
+        
         @NotBlank
         private String message;
     }
-}
 
+    @Data
+    static class ReplyRequest {
+        @NotBlank
+        private String replyContent;
+    }
+}

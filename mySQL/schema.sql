@@ -4,6 +4,7 @@ USE chooseMVP;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS reply_templates;
 DROP TABLE IF EXISTS contact_messages;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
@@ -122,19 +123,43 @@ CREATE TABLE order_items (
 
 CREATE TABLE contact_messages (
     message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    case_number VARCHAR(20) NOT NULL UNIQUE,
     user_id BIGINT NULL,
     name VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    subject VARCHAR(100) NULL,
     message TEXT NOT NULL,
-    status ENUM('UNREAD', 'READ', 'REPLIED') NOT NULL DEFAULT 'UNREAD',
+    status ENUM('PENDING', 'REPLIED_TRACKING', 'CLOSED') NOT NULL DEFAULT 'PENDING',
+    admin_reply TEXT NULL,
+    admin_reply_by BIGINT NULL,
     ip_address VARCHAR(45),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     replied_at TIMESTAMP NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (admin_reply_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    INDEX idx_case_number (case_number),
     INDEX idx_status_created (status, created_at),
     INDEX idx_email (email),
     INDEX idx_ip_created (ip_address, created_at)
 );
+
+-- 回覆模板表
+CREATE TABLE reply_templates (
+    template_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    created_by BIGINT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
+);
+
+-- 預設回覆模板
+INSERT INTO reply_templates (name, content, created_by) VALUES
+('一般問候', '親愛的 {name}，\n\n感謝您的來信詢問。\n\n{reply}\n\n如有任何其他問題，歡迎隨時與我們聯繫。\n\nChoose 客服團隊', 1),
+('商品庫存', '親愛的 {name}，\n\n關於您詢問的商品庫存問題：\n\n{reply}\n\n感謝您的耐心等候！\n\nChoose 客服團隊', 1),
+('退換貨說明', '親愛的 {name}，\n\n關於您的退換貨詢問：\n\n本店提供 7 天鑑賞期，商品未拆封、未使用可辦理退換貨。\n\n{reply}\n\n如需進一步協助，請隨時與我們聯繫。\n\nChoose 客服團隊', 1),
+('運送時間', '親愛的 {name}，\n\n關於您詢問的運送時間：\n\n一般訂單約 3-5 個工作天送達，偏遠地區可能需要多 1-2 天。\n\n{reply}\n\n感謝您的耐心等候！\n\nChoose 客服團隊', 1);
 
 INSERT INTO users (email, password, name, phone, role, created_at) VALUES
 ('kevin.lin@choose.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzGjQYQQ.YjL1XMa9O6', '林凱文', '0923456789', 'MEMBER', DATE_SUB(NOW(), INTERVAL 30 DAY)),
@@ -310,13 +335,13 @@ INSERT INTO order_items (order_id, variant_id, price, quantity) VALUES
 -- 訂單7: 美麗諾羊毛西裝外套-深灰色-L
 (7, 46, 3980.00, 1);
 
-INSERT INTO contact_messages (user_id, name, email, message, status, ip_address, created_at, replied_at) VALUES
-(2, '林凱文', 'kevin.lin@choose.com', '請問商品何時會到貨？', 'REPLIED', '192.168.1.100', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 19 DAY)),
-(3, '陳怡君', 'amy.chen@choose.com', '可以退換貨嗎？', 'READ', '192.168.1.101', DATE_SUB(NOW(), INTERVAL 15 DAY), NULL),
-(4, '黃大維', 'david.huang@choose.com', '商品品質很好，謝謝！', 'REPLIED', '192.168.1.102', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY)),
-(NULL, '周雅婷', 'tina.chou@choose.com', '想詢問是否有其他顏色？', 'UNREAD', '192.168.1.103', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL),
-(NULL, '楊志明', 'ming.yang@choose.com', '商品尺寸如何選擇？', 'READ', '192.168.1.104', DATE_SUB(NOW(), INTERVAL 3 DAY), NULL),
-(NULL, '許雅雯', 'wendy.hsu@choose.com', '請問有實體店面嗎？', 'UNREAD', '192.168.1.105', DATE_SUB(NOW(), INTERVAL 1 DAY), NULL);
+INSERT INTO contact_messages (case_number, user_id, name, email, subject, message, status, admin_reply, admin_reply_by, ip_address, created_at, replied_at) VALUES
+('CS-0001', 2, '林凱文', 'kevin.lin@choose.com', '商品到貨詢問', '請問商品何時會到貨？', 'CLOSED', '您好，商品預計3-5個工作天內到貨，届時將以簡訊通知您，感謝您的耐心等候！', 1, '192.168.1.100', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 19 DAY)),
+('CS-0002', 3, '陳怡君', 'amy.chen@choose.com', '退換貨政策', '可以退換貨嗎？', 'REPLIED_TRACKING', '您好，本店提供7天鑑賞期，商品未拆封可辦理退換貨。請問您需要退換哪件商品呢？', 1, '192.168.1.101', DATE_SUB(NOW(), INTERVAL 15 DAY), DATE_SUB(NOW(), INTERVAL 14 DAY)),
+('CS-0003', 4, '黃大維', 'david.huang@choose.com', '商品好評', '商品品質很好，謝謝！', 'CLOSED', '感謝您的肯定！期待您再次光臨 Choose！', 1, '192.168.1.102', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY)),
+('CS-0004', NULL, '周雅婷', 'tina.chou@choose.com', '顏色詢問', '想詢問是否有其他顏色？', 'PENDING', NULL, NULL, '192.168.1.103', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL),
+('CS-0005', NULL, '楊志明', 'ming.yang@choose.com', '尺寸選擇', '商品尺寸如何選擇？', 'PENDING', NULL, NULL, '192.168.1.104', DATE_SUB(NOW(), INTERVAL 3 DAY), NULL),
+('CS-0006', NULL, '許雅雯', 'wendy.hsu@choose.com', '門市詢問', '請問有實體店面嗎？', 'PENDING', NULL, NULL, '192.168.1.105', DATE_SUB(NOW(), INTERVAL 1 DAY), NULL);
 
 SELECT 'users' AS table_name, COUNT(*) AS count FROM users
 UNION ALL SELECT 'categories', COUNT(*) FROM categories

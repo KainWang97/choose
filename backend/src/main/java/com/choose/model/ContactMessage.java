@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "contact_messages", indexes = {
     // 搜尋索引
+        @Index(name = "idx_case_number", columnList = "case_number"),
         @Index(name = "idx_status_created", columnList = "status, created_at"),
         @Index(name = "idx_email", columnList = "email"),
         @Index(name = "idx_ip_created", columnList = "ip_address, created_at")
@@ -23,6 +24,9 @@ public class ContactMessage {
     @Column(name = "message_id")
     private Long messageId;
 
+    @Column(name = "case_number", nullable = false, unique = true, length = 20)
+    private String caseNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -33,12 +37,21 @@ public class ContactMessage {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
+    @Column(name = "subject", length = 100)
+    private String subject;
+
     @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private MessageStatus status = MessageStatus.UNREAD;
+    private MessageStatus status = MessageStatus.PENDING;
+
+    @Column(name = "admin_reply", columnDefinition = "TEXT")
+    private String adminReply;
+
+    @Column(name = "admin_reply_by")
+    private Long adminReplyBy;
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
@@ -55,7 +68,7 @@ public class ContactMessage {
     }
 
     public enum MessageStatus {
-        UNREAD, READ, REPLIED
+        PENDING, REPLIED_TRACKING, CLOSED
     }
 }
 
