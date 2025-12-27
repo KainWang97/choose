@@ -40,7 +40,8 @@ onMounted(async () => {
 // 從 App.vue 注入方法
 const handleUpdateOrderStatus = inject("handleUpdateOrderStatus");
 const handleReplyInquiry = inject("handleReplyInquiry");
-const handleUnreplyInquiry = inject("handleUnreplyInquiry");
+const handleCloseInquiry = inject("handleCloseInquiry");
+const handleReopenInquiry = inject("handleReopenInquiry");
 const handleCreateProduct = inject("handleCreateProduct");
 const handleUpdateProduct = inject("handleUpdateProduct");
 const handleDeleteProduct = inject("handleDeleteProduct");
@@ -79,7 +80,8 @@ watch(
       :initial-tab="adminInitialTab"
       @update-order-status="handleUpdateOrderStatus"
       @reply-inquiry="handleReplyInquiry"
-      @unreply-inquiry="handleUnreplyInquiry"
+      @close-inquiry="handleCloseInquiry"
+      @reopen-inquiry="handleReopenInquiry"
       @create-product="handleCreateProduct"
       @update-product="handleUpdateProduct"
       @delete-product="handleDeleteProduct"

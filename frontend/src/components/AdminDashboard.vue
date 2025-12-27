@@ -20,7 +20,8 @@ const props = defineProps({
 const emit = defineEmits([
   "update-order-status",
   "reply-inquiry",
-  "unreply-inquiry",
+  "close-inquiry",
+  "reopen-inquiry",
   "create-product",
   "update-product",
   "delete-product",
@@ -39,7 +40,7 @@ const emit = defineEmits([
 // ============================================
 const unreadInquiriesCount = computed(() => {
   if (!props.inquiries) return 0;
-  return props.inquiries.filter((i) => i.status !== "REPLIED").length;
+  return props.inquiries.filter((i) => i.status === "PENDING").length;
 });
 
 const pendingOrdersCount = computed(() => {
@@ -47,6 +48,12 @@ const pendingOrdersCount = computed(() => {
   return props.orders.filter(
     (o) => o.status === "PENDING" || o.status === "PAID"
   ).length;
+});
+
+// 過濾掉管理員，只顯示一般會員
+const filteredMembers = computed(() => {
+  if (!props.members) return [];
+  return props.members.filter((m) => m.role !== "ADMIN");
 });
 
 // ============================================
@@ -105,6 +112,21 @@ watch(
   (next) => {
     if (next) activeTab.value = next;
   }
+);
+
+// 正在回覆中的訊息 ID（用於顯示 loading）- 需要在 watcher 前宣告
+const replyingInquiryId = ref(null);
+
+// 監聽 inquiries 變化，清除回覆 loading 狀態
+watch(
+  () => props.inquiries,
+  () => {
+    // 資料更新後清除 loading
+    if (replyingInquiryId.value) {
+      replyingInquiryId.value = null;
+    }
+  },
+  { deep: true }
 );
 
 // ============================================
@@ -491,6 +513,195 @@ const confirmDeleteVariant = async (variant) => {
   }
 };
 
+// ============================================
+// Inquiry Reply Modal
+// ============================================
+const isReplyModalOpen = ref(false);
+const currentInquiry = ref(null);
+const replyContent = ref("");
+
+// 模板相關
+const replyTemplates = ref([]);
+const selectedTemplateId = ref("");
+const isTemplateManagerOpen = ref(false);
+const editingTemplate = ref(null);
+const templateFormData = ref({ name: "", content: "" });
+
+// 載入模板
+const loadTemplates = async () => {
+  try {
+    const { api } = await import("../services/api.js");
+    replyTemplates.value = await api.replyTemplates.getAll();
+  } catch (error) {
+    console.error("Failed to load templates:", error);
+  }
+};
+
+const openReplyModal = async (inquiry) => {
+  currentInquiry.value = inquiry;
+  replyContent.value = "";
+  selectedTemplateId.value = "";
+  isReplyModalOpen.value = true;
+  await loadTemplates();
+};
+
+const closeReplyModal = () => {
+  isReplyModalOpen.value = false;
+  currentInquiry.value = null;
+  replyContent.value = "";
+  selectedTemplateId.value = "";
+};
+
+// 套用模板（變數替換）
+const applyTemplate = () => {
+  if (!selectedTemplateId.value) return;
+  const template = replyTemplates.value.find(
+    (t) => String(t.id) === String(selectedTemplateId.value)
+  );
+  if (!template || !currentInquiry.value) return;
+
+  // 替換變數
+  let content = template.content;
+  content = content.replace(/{name}/g, currentInquiry.value.name || "");
+  content = content.replace(
+    /{subject}/g,
+    currentInquiry.value.subject || "您的詢問"
+  );
+  content = content.replace(/{reply}/g, ""); // 預留空白讓管理員填寫
+  replyContent.value = content;
+};
+
+const submitReply = () => {
+  if (!currentInquiry.value || !replyContent.value.trim()) return;
+  const inquiryId = currentInquiry.value.id;
+  const content = replyContent.value.trim();
+
+  // 先關閉 Modal
+  closeReplyModal();
+
+  // 設定 loading 狀態
+  replyingInquiryId.value = inquiryId;
+
+  // 發送回覆事件
+  emit("reply-inquiry", inquiryId, content);
+
+  // 備用：延遲清除 loading 狀態（若 watcher 未觸發）
+  setTimeout(() => {
+    replyingInquiryId.value = null;
+  }, 5000);
+};
+
+// ============================================
+// Inquiry Filter
+// ============================================
+const inquiryStatusFilter = ref("ALL");
+const inquirySearchQuery = ref("");
+
+const filteredInquiries = computed(() => {
+  if (!props.inquiries) return [];
+
+  let result = props.inquiries;
+
+  // 依狀態篩選
+  if (inquiryStatusFilter.value !== "ALL") {
+    result = result.filter((i) => i.status === inquiryStatusFilter.value);
+  }
+
+  // 依搜尋關鍵字篩選（案件編號或 email）
+  const query = inquirySearchQuery.value.trim().toLowerCase();
+  if (query) {
+    result = result.filter(
+      (i) =>
+        (i.caseNumber && i.caseNumber.toLowerCase().includes(query)) ||
+        (i.email && i.email.toLowerCase().includes(query))
+    );
+  }
+
+  return result;
+});
+
+// 確認結案
+const confirmCloseInquiry = async (inquiry) => {
+  const confirmed = await confirm({
+    title: "確認結案",
+    message: `確定要將此客服訊息標記為已結案嗎？`,
+    confirmText: "結案",
+    cancelText: "取消",
+    variant: "warning",
+  });
+  if (confirmed) {
+    emit("close-inquiry", inquiry.id);
+  }
+};
+
+// 確認重開
+const confirmReopenInquiry = async (inquiry) => {
+  const confirmed = await confirm({
+    title: "確認重開案件",
+    message: `確定要將此已結案的訊息重新開啟嗎？狀態將退回「追蹤中」。`,
+    confirmText: "重新開啟",
+    cancelText: "取消",
+    variant: "warning",
+  });
+  if (confirmed) {
+    emit("reopen-inquiry", inquiry.id);
+  }
+};
+// 模板管理 Modal
+const openTemplateManager = () => {
+  isTemplateManagerOpen.value = true;
+  editingTemplate.value = null;
+  templateFormData.value = { name: "", content: "" };
+};
+
+const closeTemplateManager = () => {
+  isTemplateManagerOpen.value = false;
+  editingTemplate.value = null;
+  templateFormData.value = { name: "", content: "" };
+};
+
+const editTemplate = (template) => {
+  editingTemplate.value = template;
+  templateFormData.value = { name: template.name, content: template.content };
+};
+
+const saveTemplate = async () => {
+  if (
+    !templateFormData.value.name.trim() ||
+    !templateFormData.value.content.trim()
+  )
+    return;
+  try {
+    const { api } = await import("../services/api.js");
+    if (editingTemplate.value) {
+      await api.replyTemplates.update(
+        editingTemplate.value.id,
+        templateFormData.value.name,
+        templateFormData.value.content
+      );
+    } else {
+      await api.replyTemplates.create(
+        templateFormData.value.name,
+        templateFormData.value.content
+      );
+    }
+    await loadTemplates();
+    editingTemplate.value = null;
+    templateFormData.value = { name: "", content: "" };
+  } catch (error) {
+    console.error("Failed to save template:", error);
+  }
+};
+
+const deleteTemplate = async (templateId) => {
+  try {
+    const { api } = await import("../services/api.js");
+    await api.replyTemplates.delete(templateId);
+    await loadTemplates();
+  } catch (error) {
+    console.error("Failed to delete template:", error);
+  }
+};
 // Helper: 取得訂單項目顯示文字
 const getOrderItemsText = (order) => {
   return order.items
@@ -1266,12 +1477,12 @@ const monthlySales = computed(() => {
           >
             <h2 class="font-serif text-xl text-sumi">Members</h2>
             <span class="text-sm text-stone-500">
-              共 {{ members?.length || 0 }} 位會員
+              共 {{ filteredMembers?.length || 0 }} 位會員
             </span>
           </div>
 
           <p
-            v-if="!members || members.length === 0"
+            v-if="!filteredMembers || filteredMembers.length === 0"
             class="text-stone-400 italic"
           >
             No members found.
@@ -1283,38 +1494,21 @@ const monthlySales = computed(() => {
                 <tr
                   class="text-xs uppercase tracking-widest text-stone-400 border-b border-stone-200"
                 >
-                  <th class="pb-4 font-normal">姓名</th>
-                  <th class="pb-4 font-normal">Email</th>
-                  <th class="pb-4 font-normal">電話</th>
-                  <th class="pb-4 font-normal">角色</th>
-                  <th class="pb-4 font-normal">訂單數</th>
+                  <th class="pb-4 font-normal">帳號</th>
+                  <th class="pb-4 font-normal text-center">訂單數</th>
                 </tr>
               </thead>
               <tbody class="text-sm font-light text-stone-600">
                 <tr
-                  v-for="member in members"
+                  v-for="member in filteredMembers"
                   :key="member.id"
                   class="border-b border-stone-50 hover:bg-stone-50/50"
                 >
                   <td class="py-4 pr-4 font-medium text-sumi">
-                    {{ member.name }}
-                  </td>
-                  <td class="py-4 pr-4">{{ member.email }}</td>
-                  <td class="py-4 pr-4">{{ member.phone || "-" }}</td>
-                  <td class="py-4 pr-4">
-                    <span
-                      :class="
-                        member.role === 'ADMIN'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-stone-100 text-stone-600'
-                      "
-                      class="px-2 py-1 rounded text-xs uppercase"
-                    >
-                      {{ member.role }}
-                    </span>
+                    {{ member.email }}
                   </td>
                   <td class="py-4 pr-4 text-center">
-                    <span class="bg-stone-100 px-2 py-1 rounded text-xs">
+                    <span class="bg-stone-100 px-3 py-1 rounded text-xs">
                       {{ member.orderCount || 0 }}
                     </span>
                   </td>
@@ -1457,47 +1651,89 @@ const monthlySales = computed(() => {
         </div>
 
         <!-- Inquiries Tab -->
-        <div v-if="activeTab === 'INQUIRIES'" class="space-y-6">
-          <h2
-            class="font-serif text-xl text-sumi border-b border-stone-100 pb-4"
+        <div v-if="activeTab === 'INQUIRIES'" class="space-y-4">
+          <div class="flex flex-col gap-3 border-b border-stone-100 pb-4">
+            <h2 class="font-serif text-lg sm:text-xl text-sumi">
+              客服訊息管理
+            </h2>
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+              <input
+                v-model="inquirySearchQuery"
+                type="text"
+                placeholder="搜尋案件編號或 Email..."
+                class="flex-1 px-3 py-2 border border-stone-300 text-xs sm:text-sm focus:outline-none focus:border-sumi min-w-0"
+              />
+              <select
+                v-model="inquiryStatusFilter"
+                class="px-3 py-2 border border-stone-300 text-xs sm:text-sm focus:outline-none focus:border-sumi shrink-0"
+              >
+                <option value="ALL">全部</option>
+                <option value="PENDING">待處理</option>
+                <option value="REPLIED_TRACKING">追蹤中</option>
+                <option value="CLOSED">已結案</option>
+              </select>
+            </div>
+          </div>
+          <p
+            v-if="filteredInquiries.length === 0"
+            class="text-stone-400 italic"
           >
-            Customer Inquiries
-          </h2>
-          <p v-if="inquiries.length === 0" class="text-stone-400 italic">
-            No new messages.
+            No messages found.
           </p>
           <div v-else class="grid grid-cols-1 gap-4">
             <div
-              v-for="inquiry in inquiries"
+              v-for="inquiry in filteredInquiries"
               :key="inquiry.id"
               class="p-6 border-2 rounded transition-all"
               :class="
-                inquiry.status === 'UNREAD'
+                inquiry.status === 'PENDING'
                   ? 'border-amber-400 bg-amber-50 shadow-md'
-                  : inquiry.status === 'REPLIED'
-                  ? 'border-stone-200 bg-stone-50 opacity-70'
-                  : 'border-orange-300 bg-orange-50'
+                  : inquiry.status === 'REPLIED_TRACKING'
+                  ? 'border-orange-300 bg-orange-50'
+                  : 'border-stone-200 bg-stone-50 opacity-70'
               "
             >
               <div class="flex justify-between items-start mb-4">
                 <div>
-                  <h3 class="font-serif text-sumi">{{ inquiry.name }}</h3>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-serif text-sumi">{{ inquiry.name }}</h3>
+                    <span
+                      v-if="inquiry.caseNumber"
+                      class="text-sm font-mono text-stone-400 bg-stone-100 px-2 py-0.5 rounded"
+                    >
+                      編號:{{ inquiry.caseNumber }}
+                    </span>
+                  </div>
+                  <p v-if="inquiry.subject" class="text-xs text-stone-500 mb-1">
+                    主題：{{ inquiry.subject }}
+                  </p>
                   <a
-                    :href="`mailto:${
-                      inquiry.email
-                    }?subject=Re: 您的詢問 - Choose&body=您好 ${
-                      inquiry.name
-                    }，%0A%0A感謝您的詢問：%0A「${encodeURIComponent(
-                      inquiry.message
-                    )}」%0A%0A`"
+                    :href="`mailto:${inquiry.email}`"
                     class="text-xs text-blue-600 hover:text-blue-800 hover:underline"
                   >
                     {{ inquiry.email }}
                   </a>
                 </div>
                 <div class="text-right">
-                  <p class="text-sm text-stone-400">Date</p>
-                  <p class="text-xs text-stone-500 font-medium">
+                  <span
+                    class="inline-block px-2 py-1 text-xs uppercase tracking-wider rounded mb-2"
+                    :class="
+                      inquiry.status === 'PENDING'
+                        ? 'bg-amber-500 text-white'
+                        : inquiry.status === 'REPLIED_TRACKING'
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-green-600 text-white'
+                    "
+                  >
+                    {{
+                      inquiry.status === "PENDING"
+                        ? "待處理"
+                        : inquiry.status === "REPLIED_TRACKING"
+                        ? "追蹤中"
+                        : "已結案"
+                    }}
+                  </span>
+                  <p class="text-xs text-stone-500">
                     {{ formatDateTime(inquiry.createdAt) }}
                   </p>
                 </div>
@@ -1507,47 +1743,57 @@ const monthlySales = computed(() => {
               >
                 {{ inquiry.message }}
               </p>
+              <!-- 顯示已回覆內容 -->
+              <div
+                v-if="inquiry.adminReply"
+                class="mb-4 p-4 bg-green-50 border border-green-200 rounded"
+              >
+                <p class="text-xs text-green-600 uppercase tracking-wider mb-1">
+                  已回覆內容
+                </p>
+                <p class="text-sm text-stone-700 whitespace-pre-wrap">
+                  {{ inquiry.adminReply }}
+                </p>
+                <p v-if="inquiry.repliedAt" class="text-xs text-stone-400 mt-2">
+                  回覆時間：{{ formatDateTime(inquiry.repliedAt) }}
+                </p>
+              </div>
               <div class="flex justify-end gap-3">
-                <a
-                  :href="`mailto:${
-                    inquiry.email
-                  }?subject=Re: 您的詢問 - Choose&body=您好 ${
-                    inquiry.name
-                  }，%0A%0A感謝您的詢問：%0A「${encodeURIComponent(
-                    inquiry.message
-                  )}」%0A%0A`"
-                  class="px-4 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50 inline-flex items-center gap-2"
+                <!-- Loading 狀態 -->
+                <div
+                  v-if="replyingInquiryId === inquiry.id"
+                  class="flex items-center gap-2 text-stone-500"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <div
+                    class="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"
+                  ></div>
+                  <span class="text-xs uppercase tracking-widest"
+                    >回覆中...</span
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  Reply by Email
-                </a>
+                </div>
+                <!-- 待處理：顯示回覆按鈕 -->
                 <button
-                  v-if="inquiry.status !== 'REPLIED'"
-                  @click="emit('reply-inquiry', inquiry.id)"
+                  v-else-if="inquiry.status === 'PENDING'"
+                  @click="openReplyModal(inquiry)"
                   class="px-4 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800"
                 >
-                  Mark as Replied
+                  回覆
                 </button>
+                <!-- 追蹤中：顯示結案按鈕 -->
                 <button
-                  v-else
-                  @click="emit('unreply-inquiry', inquiry.id)"
-                  class="text-xs uppercase tracking-widest text-green-700 flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer"
-                  title="點擊取消已回覆狀態"
+                  v-if="inquiry.status === 'REPLIED_TRACKING'"
+                  @click="confirmCloseInquiry(inquiry)"
+                  class="px-4 py-2 bg-green-600 text-white text-xs uppercase tracking-widest hover:bg-green-700"
                 >
-                  ✓ Replied
+                  結案
+                </button>
+                <!-- 已結案：顯示重開按鈕 -->
+                <button
+                  v-if="inquiry.status === 'CLOSED'"
+                  @click="confirmReopenInquiry(inquiry)"
+                  class="px-4 py-2 border border-stone-400 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-100"
+                >
+                  重新開啟
                 </button>
               </div>
             </div>
@@ -2088,6 +2334,229 @@ const monthlySales = computed(() => {
             </button>
           </form>
           <p class="text-xs text-stone-400 mt-3">SKU 編碼將自動產生</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reply Inquiry Modal -->
+    <div
+      v-if="isReplyModalOpen && currentInquiry"
+      class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      @click.self="closeReplyModal"
+    >
+      <div class="bg-white max-w-2xl w-full p-8 shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-serif text-2xl text-sumi">回覆客服訊息</h2>
+          <button
+            @click="closeReplyModal"
+            class="text-stone-400 hover:text-sumi text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- 原始訊息 -->
+        <div class="mb-6 p-4 bg-stone-50 border border-stone-200 rounded">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="font-medium text-sumi">{{ currentInquiry.name }}</p>
+              <p class="text-xs text-stone-500">{{ currentInquiry.email }}</p>
+            </div>
+            <p class="text-xs text-stone-400">
+              {{ formatDateTime(currentInquiry.createdAt) }}
+            </p>
+          </div>
+          <p v-if="currentInquiry.subject" class="text-xs text-stone-500 mb-2">
+            主題：{{ currentInquiry.subject }}
+          </p>
+          <p class="text-sm text-stone-600 whitespace-pre-wrap">
+            {{ currentInquiry.message }}
+          </p>
+        </div>
+
+        <!-- 回覆輸入 -->
+        <form @submit.prevent="submitReply" class="space-y-4">
+          <div>
+            <label class="block text-sm text-stone-500 mb-2">回覆內容 *</label>
+            <textarea
+              v-model="replyContent"
+              required
+              rows="6"
+              class="w-full border border-stone-300 p-3 text-sm focus:outline-none focus:border-sumi resize-none"
+              placeholder="輸入您的回覆內容..."
+            ></textarea>
+          </div>
+          <p class="text-xs text-stone-400">送出後將自動發送 Email 通知用戶</p>
+          <div class="flex justify-end gap-3 pt-4 border-t border-stone-100">
+            <button
+              type="button"
+              @click="closeReplyModal"
+              class="px-6 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50"
+            >
+              取消
+            </button>
+            <button
+              type="submit"
+              :disabled="!replyContent.trim()"
+              class="px-6 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              送出回覆
+            </button>
+          </div>
+        </form>
+
+        <!-- 模板選擇區 -->
+        <div class="mt-6 pt-6 border-t border-stone-200">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-sm text-stone-500">使用回覆模板</label>
+            <button
+              type="button"
+              @click="openTemplateManager"
+              class="text-xs text-blue-600 hover:text-blue-800 underline"
+            >
+              管理模板
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <select
+              v-model="selectedTemplateId"
+              class="flex-1 border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi"
+            >
+              <option value="">-- 選擇模板 --</option>
+              <option v-for="t in replyTemplates" :key="t.id" :value="t.id">
+                {{ t.name }}
+              </option>
+            </select>
+            <button
+              type="button"
+              @click="applyTemplate"
+              :disabled="!selectedTemplateId"
+              class="px-4 py-2 bg-stone-600 text-white text-xs uppercase hover:bg-stone-700 disabled:opacity-50"
+            >
+              套用
+            </button>
+          </div>
+          <p class="text-xs text-stone-400 mt-2">
+            支援變數：{name} = 用戶姓名、{subject} = 主題、{reply} = 自訂回覆
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template Manager Modal -->
+    <div
+      v-if="isTemplateManagerOpen"
+      class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4"
+      @click.self="closeTemplateManager"
+    >
+      <div
+        class="bg-white max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8 shadow-xl"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-serif text-xl text-sumi">管理回覆模板</h2>
+          <button
+            @click="closeTemplateManager"
+            class="text-stone-400 hover:text-sumi text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- 現有模板列表 -->
+        <div class="mb-6">
+          <h3 class="text-sm uppercase tracking-widest text-stone-500 mb-3">
+            現有模板
+          </h3>
+          <div
+            v-if="replyTemplates.length === 0"
+            class="text-stone-400 italic text-sm"
+          >
+            尚無模板
+          </div>
+          <div v-else class="space-y-3">
+            <div
+              v-for="t in replyTemplates"
+              :key="t.id"
+              class="p-3 border border-stone-200 rounded flex justify-between items-start"
+            >
+              <div class="flex-1">
+                <p class="font-medium text-sumi">{{ t.name }}</p>
+                <p class="text-xs text-stone-400 mt-1 line-clamp-2">
+                  {{ t.content }}
+                </p>
+              </div>
+              <div class="flex gap-2 ml-4">
+                <button
+                  @click="editTemplate(t)"
+                  class="text-xs text-blue-600 hover:underline"
+                >
+                  編輯
+                </button>
+                <button
+                  @click="deleteTemplate(t.id)"
+                  class="text-xs text-red-600 hover:underline"
+                >
+                  刪除
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 新增/編輯表單 -->
+        <div class="border-t border-stone-200 pt-6">
+          <h3 class="text-sm uppercase tracking-widest text-stone-500 mb-3">
+            {{ editingTemplate ? "編輯模板" : "新增模板" }}
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs text-stone-500 mb-1"
+                >模板名稱 *</label
+              >
+              <input
+                v-model="templateFormData.name"
+                type="text"
+                class="w-full border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi"
+                placeholder="例：一般問候"
+              />
+            </div>
+            <div>
+              <label class="block text-xs text-stone-500 mb-1"
+                >模板內容 *</label
+              >
+              <textarea
+                v-model="templateFormData.content"
+                rows="6"
+                class="w-full border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi resize-none"
+                placeholder="親愛的 {name}，..."
+              ></textarea>
+              <p class="text-xs text-stone-400 mt-1">
+                可使用變數：{name}、{subject}、{reply}
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <button
+                @click="saveTemplate"
+                :disabled="
+                  !templateFormData.name.trim() ||
+                  !templateFormData.content.trim()
+                "
+                class="px-4 py-2 bg-sumi text-washi text-xs uppercase hover:bg-stone-800 disabled:opacity-50"
+              >
+                {{ editingTemplate ? "更新" : "新增" }}
+              </button>
+              <button
+                v-if="editingTemplate"
+                @click="
+                  editingTemplate = null;
+                  templateFormData = { name: '', content: '' };
+                "
+                class="px-4 py-2 border border-stone-300 text-stone-600 text-xs uppercase hover:bg-stone-50"
+              >
+                取消
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -203,6 +203,11 @@ const handleMagicLink = async () => {
       localStorage.removeItem("postVerifyRedirect");
     }
 
+    // 儲存購物車到 localStorage（避免頁面重載後遺失）
+    if (cart && cart.value && cart.value.length > 0) {
+      localStorage.setItem("pendingCart", JSON.stringify(cart.value));
+    }
+
     magicLinkSent.value = true;
   } catch (error) {
     errorMessage.value = "發送失敗，請稍後再試";

@@ -582,23 +582,57 @@ const handleUpdateOrderStatus = async (id, status) => {
   }
 };
 
-const handleReplyInquiry = async (id) => {
+const handleReplyInquiry = async (id, replyContent) => {
   try {
-    await api.inquiries.markAsReplied(id);
-    const inquiry = inquiries.value.find((i) => i.id === id);
-    if (inquiry) inquiry.status = "REPLIED";
+    const updated = await api.inquiries.reply(id, replyContent);
+    if (updated) {
+      const index = inquiries.value.findIndex((i) => i.id === id);
+      if (index !== -1) {
+        inquiries.value[index] = updated;
+      }
+      toast.success("已回覆並發送 Email");
+    } else {
+      toast.error("回覆失敗");
+    }
   } catch (error) {
     console.error("Failed to reply inquiry:", error);
+    toast.error("回覆失敗");
   }
 };
 
-const handleUnreplyInquiry = async (id) => {
+const handleCloseInquiry = async (id) => {
   try {
-    await api.inquiries.markAsUnreplied(id);
-    const inquiry = inquiries.value.find((i) => i.id === id);
-    if (inquiry) inquiry.status = "UNREAD";
+    const updated = await api.inquiries.close(id);
+    if (updated) {
+      const index = inquiries.value.findIndex((i) => i.id === id);
+      if (index !== -1) {
+        inquiries.value[index] = updated;
+      }
+      toast.success("已結案");
+    } else {
+      toast.error("結案失敗");
+    }
   } catch (error) {
-    console.error("Failed to unreply inquiry:", error);
+    console.error("Failed to close inquiry:", error);
+    toast.error("結案失敗");
+  }
+};
+
+const handleReopenInquiry = async (id) => {
+  try {
+    const updated = await api.inquiries.reopen(id);
+    if (updated) {
+      const index = inquiries.value.findIndex((i) => i.id === id);
+      if (index !== -1) {
+        inquiries.value[index] = updated;
+      }
+      toast.success("已重新開啟案件");
+    } else {
+      toast.error("重新開啟失敗");
+    }
+  } catch (error) {
+    console.error("Failed to reopen inquiry:", error);
+    toast.error("重新開啟失敗");
   }
 };
 
@@ -819,7 +853,8 @@ provide("handleContactSubmit", handleContactSubmit);
 provide("handlePlaceOrder", handlePlaceOrder);
 provide("handleUpdateOrderStatus", handleUpdateOrderStatus);
 provide("handleReplyInquiry", handleReplyInquiry);
-provide("handleUnreplyInquiry", handleUnreplyInquiry);
+provide("handleCloseInquiry", handleCloseInquiry);
+provide("handleReopenInquiry", handleReopenInquiry);
 provide("handleCreateProduct", handleCreateProduct);
 provide("handleUpdateProduct", handleUpdateProduct);
 provide("handleDeleteProduct", handleDeleteProduct);

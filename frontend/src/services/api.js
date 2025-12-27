@@ -149,11 +149,15 @@ async function transformOrder(backend) {
 function transformInquiry(backend) {
   return {
     id: String(backend.id),
+    caseNumber: backend.caseNumber,
     userId: backend.userId ? String(backend.userId) : undefined,
     name: backend.name,
     email: backend.email,
+    subject: backend.subject,
     message: backend.message,
     status: backend.status,
+    adminReply: backend.adminReply,
+    adminReplyBy: backend.adminReplyBy,
     createdAt: backend.createdAt,
     repliedAt: backend.repliedAt,
     date: backend.createdAt
@@ -641,7 +645,7 @@ export const inquiryApi = {
   /**
    * 送出聯絡詢問
    * POST /api/inquiries
-   * @param {{ name: string; email: string; message: string }} data
+   * @param {{ name: string; email: string; subject?: string; message: string }} data
    * @returns {Promise<import('../types.js').Inquiry>}
    */
   async create(data) {
@@ -650,33 +654,86 @@ export const inquiryApi = {
   },
 
   /**
-   * 標記已回覆 (Admin)
-   * PATCH /api/inquiries/:id/reply
+   * 回覆客服訊息（含發送 Email）
+   * POST /api/inquiries/:id/reply
    * @param {string} id
-   * @returns {Promise<boolean>}
+   * @param {string} replyContent
+   * @returns {Promise<import('../types.js').Inquiry | null>}
    */
-  async markAsReplied(id) {
+  async reply(id, replyContent) {
     try {
-      await apiPatch(`/inquiries/${id}/reply`);
-      return true;
+      const backend = await apiPost(`/inquiries/${id}/reply`, { replyContent });
+      return transformInquiry(backend);
     } catch {
-      return false;
+      return null;
     }
   },
 
   /**
-   * 取消已回覆 (Admin)
-   * PATCH /api/inquiries/:id/unreply
+   * 結案客服訊息
+   * PATCH /api/inquiries/:id/close
    * @param {string} id
-   * @returns {Promise<boolean>}
+   * @returns {Promise<import('../types.js').Inquiry | null>}
    */
-  async markAsUnreplied(id) {
+  async close(id) {
     try {
-      await apiPatch(`/inquiries/${id}/unreply`);
-      return true;
+      const backend = await apiPatch(`/inquiries/${id}/close`);
+      return transformInquiry(backend);
     } catch {
-      return false;
+      return null;
     }
+  },
+
+  /**
+   * 重開案件（從已結案退回處理中）
+   * PATCH /api/inquiries/:id/reopen
+   * @param {string} id
+   * @returns {Promise<import('../types.js').Inquiry | null>}
+   */
+  async reopen(id) {
+    try {
+      const backend = await apiPatch(`/inquiries/${id}/reopen`);
+      return transformInquiry(backend);
+    } catch {
+      return null;
+    }
+  },
+};
+
+// ============================================
+// Reply Template API
+// ============================================
+export const replyTemplateApi = {
+  /**
+   * 取得所有回覆模板 (Admin)
+   * GET /api/reply-templates
+   */
+  async getAll() {
+    return await apiGet("/reply-templates");
+  },
+
+  /**
+   * 新增回覆模板 (Admin)
+   * POST /api/reply-templates
+   */
+  async create(name, content) {
+    return await apiPost("/reply-templates", { name, content });
+  },
+
+  /**
+   * 更新回覆模板 (Admin)
+   * PUT /api/reply-templates/:id
+   */
+  async update(id, name, content) {
+    return await apiPut(`/reply-templates/${id}`, { name, content });
+  },
+
+  /**
+   * 刪除回覆模板 (Admin)
+   * DELETE /api/reply-templates/:id
+   */
+  async delete(id) {
+    return await apiDelete(`/reply-templates/${id}`);
   },
 };
 
@@ -1146,6 +1203,20 @@ export const userApi = {
   async deleteAccount(password) {
     await apiPost("/users/me/delete", { password });
   },
+
+  /**
+   * 取得會員消費統計 (Admin)
+   * GET /api/users/:userId/statistics
+   * @param {string} userId
+   * @returns {Promise<Object | null>}
+   */
+  async getStatistics(userId) {
+    try {
+      return await apiGet(`/users/${userId}/statistics`);
+    } catch {
+      return null;
+    }
+  },
 };
 
 // ============================================
@@ -1161,6 +1232,7 @@ export const api = {
   featured: featuredApi,
   cart: cartApi,
   users: userApi,
+  replyTemplates: replyTemplateApi,
 };
 
 export default api;
