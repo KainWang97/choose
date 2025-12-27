@@ -68,6 +68,8 @@ public class ProductService {
         if (updatedProduct.getIsListed() != null) {
             product.setIsListed(updatedProduct.getIsListed());
         }
+        // colorImages 更新：允許設為 null（清除）或更新為新值
+        product.setColorImages(updatedProduct.getColorImages());
         
         Product saved = productRepository.save(product);
         log.info("Product updated: productId={}", productId);

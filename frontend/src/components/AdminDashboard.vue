@@ -119,6 +119,7 @@ const formData = ref({
   description: "",
   imageUrl: "",
   isListed: false,
+  colorImages: {}, // 顏色對應圖片 { "White": ["url1", "url2"], "Black": ["url1"] }
 });
 
 // Image Upload State
@@ -126,6 +127,11 @@ const isUploading = ref(false);
 const uploadError = ref(false);
 const pendingFile = ref(null);
 const previewUrl = ref(null);
+
+// Color Images Upload State
+const colorImageFile = ref(null);
+const colorImageColor = ref("");
+const isColorImageUploading = ref(false);
 
 // ============================================
 // Variant Form State
@@ -141,6 +147,12 @@ const activeVariantProduct = computed(() => {
     props.products.find((p) => p.id === currentProductForVariant.value?.id) ||
     currentProductForVariant.value
   );
+});
+
+// 取得當前商品已定義的顏色（從 colorImages 的 keys）
+const availableColorsForVariant = computed(() => {
+  if (!activeVariantProduct.value?.colorImages) return [];
+  return Object.keys(activeVariantProduct.value.colorImages);
 });
 
 const variantFormData = ref({
@@ -242,10 +254,13 @@ const openNewProductForm = () => {
     description: "",
     imageUrl: "",
     isListed: false,
+    colorImages: {},
   };
   previewUrl.value = null;
   pendingFile.value = null;
   uploadError.value = false;
+  colorImageFile.value = null;
+  colorImageColor.value = "";
   isFormOpen.value = true;
 };
 
@@ -258,10 +273,13 @@ const openEditForm = (product) => {
     description: product.description,
     imageUrl: product.imageUrl,
     isListed: product.isListed,
+    colorImages: product.colorImages ? { ...product.colorImages } : {},
   };
   previewUrl.value = product.imageUrl || null;
   pendingFile.value = null;
   uploadError.value = false;
+  colorImageFile.value = null;
+  colorImageColor.value = "";
   isFormOpen.value = true;
 };
 
@@ -271,6 +289,8 @@ const closeForm = () => {
   pendingFile.value = null;
   previewUrl.value = null;
   uploadError.value = false;
+  colorImageFile.value = null;
+  colorImageColor.value = "";
 };
 
 const handleFileSelect = (event) => {
@@ -300,6 +320,50 @@ const uploadImage = async () => {
   }
 };
 
+// ============================================
+// Color Images Upload Functions
+// ============================================
+const handleColorImageSelect = (event) => {
+  const input = event.target;
+  if (input.files && input.files[0]) {
+    colorImageFile.value = input.files[0];
+  }
+};
+
+const uploadColorImage = async () => {
+  if (!colorImageFile.value || !colorImageColor.value.trim()) return;
+
+  isColorImageUploading.value = true;
+  try {
+    const url = await uploadImageHandler(colorImageFile.value);
+    const color = colorImageColor.value.trim();
+
+    // 初始化或新增到該顏色的圖片陣列
+    if (!formData.value.colorImages[color]) {
+      formData.value.colorImages[color] = [];
+    }
+    formData.value.colorImages[color].push(url);
+
+    // 重置
+    colorImageFile.value = null;
+    colorImageColor.value = "";
+  } catch (error) {
+    console.error("Color image upload failed:", error);
+  } finally {
+    isColorImageUploading.value = false;
+  }
+};
+
+const removeColorImage = (color, index) => {
+  if (formData.value.colorImages[color]) {
+    formData.value.colorImages[color].splice(index, 1);
+    // 如果該顏色沒有圖片了，刪除該 key
+    if (formData.value.colorImages[color].length === 0) {
+      delete formData.value.colorImages[color];
+    }
+  }
+};
+
 const submitForm = async () => {
   if (pendingFile.value && !uploadError.value) {
     await uploadImage();
@@ -309,6 +373,10 @@ const submitForm = async () => {
   const category = props.categories.find(
     (c) => c.id === formData.value.categoryId
   );
+
+  // 只有當有顏色圖片時才包含 colorImages
+  const hasColorImages = Object.keys(formData.value.colorImages).length > 0;
+
   const productData = {
     name: formData.value.name,
     price: formData.value.price,
@@ -317,6 +385,7 @@ const submitForm = async () => {
     description: formData.value.description,
     imageUrl: formData.value.imageUrl,
     isListed: formData.value.isListed,
+    colorImages: hasColorImages ? formData.value.colorImages : null,
   };
 
   try {
@@ -1708,6 +1777,91 @@ const monthlySales = computed(() => {
             ></textarea>
           </div>
 
+          <!-- Color Images Section -->
+          <div class="space-y-4 border-t pt-4">
+            <label
+              class="block text-xs uppercase tracking-widest text-stone-500"
+              >顏色圖片（選填）</label
+            >
+
+            <!-- 現有圖片顯示 -->
+            <div
+              v-if="Object.keys(formData.colorImages).length > 0"
+              class="space-y-3"
+            >
+              <div
+                v-for="(images, color) in formData.colorImages"
+                :key="color"
+                class="border border-stone-200 p-3 rounded"
+              >
+                <p class="text-sm font-medium text-stone-600 mb-2">
+                  {{ color }}
+                </p>
+                <div class="flex gap-2 flex-wrap">
+                  <div
+                    v-for="(url, index) in images"
+                    :key="index"
+                    class="relative w-16 h-16 group"
+                  >
+                    <img :src="url" class="w-full h-full object-cover border" />
+                    <button
+                      type="button"
+                      @click="removeColorImage(color, index)"
+                      class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 新增圖片 -->
+            <div class="flex gap-2 items-end">
+              <div class="flex-1">
+                <label class="block text-xs text-stone-400 mb-1"
+                  >顏色名稱</label
+                >
+                <input
+                  v-model="colorImageColor"
+                  type="text"
+                  placeholder="例如：White, Black"
+                  class="w-full border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-xs text-stone-400 mb-1"
+                  >選擇圖片</label
+                >
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="handleColorImageSelect"
+                  class="w-full text-sm text-stone-500 file:mr-2 file:py-1 file:px-3 file:border file:border-stone-300 file:text-xs file:bg-white file:text-stone-700 hover:file:bg-stone-50"
+                />
+              </div>
+              <button
+                type="button"
+                @click="uploadColorImage"
+                :disabled="
+                  !colorImageFile ||
+                  !colorImageColor.trim() ||
+                  isColorImageUploading
+                "
+                class="px-4 py-2 bg-stone-700 text-white text-xs disabled:bg-stone-300 disabled:cursor-not-allowed"
+              >
+                <span
+                  v-if="isColorImageUploading"
+                  class="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></span>
+                <span v-else>新增</span>
+              </button>
+            </div>
+            <p class="text-xs text-stone-400">
+              提示：先輸入顏色名稱（需與商品規格的顏色一致），再選擇圖片上傳
+            </p>
+          </div>
+
           <div class="flex justify-end gap-4 pt-4 border-t border-stone-200">
             <button
               type="button"
@@ -1861,7 +2015,25 @@ const monthlySales = computed(() => {
           >
             <div class="space-y-1">
               <label class="block text-xs text-stone-500">Color *</label>
+              <!-- 如果有預定義顏色，顯示下拉選單 -->
+              <select
+                v-if="availableColorsForVariant.length > 0"
+                v-model="variantFormData.color"
+                required
+                class="w-36 border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi bg-white"
+              >
+                <option value="" disabled>選擇顏色</option>
+                <option
+                  v-for="color in availableColorsForVariant"
+                  :key="color"
+                  :value="color"
+                >
+                  {{ color }}
+                </option>
+              </select>
+              <!-- 如果沒有預定義顏色，顯示輸入框 -->
               <input
+                v-else
                 v-model="variantFormData.color"
                 required
                 placeholder="e.g. White, Black"

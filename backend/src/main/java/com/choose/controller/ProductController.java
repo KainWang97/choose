@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -97,6 +98,7 @@ public class ProductController {
         product.setPrice(request.getPrice());
         product.setImageUrl(request.getImageUrl());
         product.setIsListed(request.getIsListed() != null ? request.getIsListed() : true);
+        product.setColorImages(request.getColorImagesJson());
         
         Product created = productService.createProduct(product);
         return ResponseEntity.ok(ApiResponse.success("Product created successfully", ProductDTO.fromEntity(created)));
@@ -119,6 +121,7 @@ public class ProductController {
         updatedData.setPrice(request.getPrice());
         updatedData.setImageUrl(request.getImageUrl());
         updatedData.setIsListed(request.getIsListed());
+        updatedData.setColorImages(request.getColorImagesJson());
         
         Product updated = productService.updateProduct(productId, updatedData);
         return ResponseEntity.ok(ApiResponse.success("Product updated successfully", ProductDTO.fromEntity(updated)));
@@ -167,6 +170,20 @@ public class ProductController {
         private String imageUrl;
         
         private Boolean isListed;
+        
+        private Map<String, List<String>> colorImages;
+        
+        // 將 Map 轉換為 JSON 字串
+        public String getColorImagesJson() {
+            if (colorImages == null || colorImages.isEmpty()) {
+                return null;
+            }
+            try {
+                return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(colorImages);
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
     @Data

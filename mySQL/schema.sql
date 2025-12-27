@@ -40,6 +40,7 @@ CREATE TABLE products (
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     image_url VARCHAR(255),
+    color_images TEXT,
     is_listed BOOLEAN DEFAULT TRUE,
     is_featured BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -133,17 +134,17 @@ INSERT INTO categories (name, description, created_at) VALUES
 ('Accessories', '配件、帽子、包包、飾品', DATE_SUB(NOW(), INTERVAL 60 DAY)),
 ('Shoes', '鞋款、鞋子、靴子', DATE_SUB(NOW(), INTERVAL 60 DAY));
 
-INSERT INTO products (category_id, name, description, price, image_url, is_listed, created_at) VALUES
-(1, '白色基本款T恤', '五分袖、寬鬆剪裁、落肩設計，營造休閒感。百搭的經典款式，適合日常穿搭。', 580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764556/T.png', TRUE, DATE_SUB(NOW(), INTERVAL 50 DAY)),
-(1, '灰色刺繡字母襯衫', '精緻刺繡字母設計，質感面料，適合商務休閒場合。', 1280.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765126114/kx35gnwkfiabfvkupriw.png', TRUE, DATE_SUB(NOW(), INTERVAL 45 DAY)),
-(1, '條紋針織衫', '柔軟針織材質，條紋設計增添時尚感，春秋季節必備單品。', 1580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764560/Beige.png', TRUE, DATE_SUB(NOW(), INTERVAL 40 DAY)),
-(2, '黑色長寬褲', '經典黑色寬版長褲，舒適百搭，適合日常穿搭，版型修身不顯胖。', 1280.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1764695664/ofz5xacuymgz87sbvqbw.png', TRUE, DATE_SUB(NOW(), INTERVAL 50 DAY)),
-(2, '卡其色直筒褲', '經典卡其色，直筒版型修飾腿型，適合各種場合穿著。', 1180.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764563/Asset_3.png', TRUE, DATE_SUB(NOW(), INTERVAL 45 DAY)),
-(2, '深藍色牛仔褲', '經典牛仔褲款，彈性材質，舒適耐穿，百搭必備。', 980.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764566/Asset_4.png', TRUE, DATE_SUB(NOW(), INTERVAL 40 DAY)),
-(3, '黑色風衣外套', '防風防潑水材質，簡約設計，適合春秋季節穿著。', 2580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765124753/gpcji2ea4d0wfhbyzg05.png', TRUE, DATE_SUB(NOW(), INTERVAL 35 DAY)),
-(3, '米色針織外套', '柔軟針織材質，寬鬆版型，舒適保暖，適合室內外穿著。', 1880.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765779235/uyoijacket.png', TRUE, DATE_SUB(NOW(), INTERVAL 30 DAY)),
-(4, '帆布托特包', '大容量設計，堅固耐用，適合日常通勤使用。', 680.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765765059/Asset_1.png', TRUE, DATE_SUB(NOW(), INTERVAL 25 DAY)),
-(4, '棒球帽', '經典棒球帽設計，可調節帽圍，防曬遮陽必備。', 480.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765765062/Asset_2.png', TRUE, DATE_SUB(NOW(), INTERVAL 20 DAY));
+INSERT INTO products (category_id, name, description, price, image_url, color_images, is_listed, created_at) VALUES
+(1, '基本款T恤', '五分袖、寬鬆剪裁、落肩設計，營造休閒感。百搭的經典款式，適合日常穿搭。', 580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764556/T.png', '{"White": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764560/Beige.png", "https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764563/Asset_3.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 50 DAY)),
+(1, '刺繡字母襯衫', '精緻刺繡字母設計，質感面料，適合商務休閒場合。', 1280.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765126114/kx35gnwkfiabfvkupriw.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 45 DAY)),
+(1, '條紋針織衫', '柔軟針織材質，條紋設計增添時尚感，春秋季節必備單品。', 1580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764560/Beige.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 40 DAY)),
+(2, '長寬褲', '經典寬版長褲，舒適百搭，適合日常穿搭，版型修身不顯胖。', 1280.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1764695664/ofz5xacuymgz87sbvqbw.png', '{"Black": ["https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764566/Asset_4.png"]}', TRUE, DATE_SUB(NOW(), INTERVAL 50 DAY)),
+(2, '直筒褲', '經典直筒版型修飾腿型，適合各種場合穿著。', 1180.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764563/Asset_3.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 45 DAY)),
+(2, '牛仔褲', '經典牛仔褲款，彈性材質，舒適耐穿，百搭必備。', 980.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765764566/Asset_4.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 40 DAY)),
+(3, '風衣外套', '防風防潑水材質，簡約設計，適合春秋季節穿著。', 2580.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765124753/gpcji2ea4d0wfhbyzg05.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 35 DAY)),
+(3, '針織外套', '柔軟針織材質，寬鬆版型，舒適保暖，適合室內外穿著。', 1880.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765779235/uyoijacket.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 30 DAY)),
+(4, '帆布托特包', '大容量設計，堅固耐用，適合日常通勤使用。', 680.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765765059/Asset_1.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 25 DAY)),
+(4, '棒球帽', '經典棒球帽設計，可調節帽圍，防曬遮陽必備。', 480.00, 'https://res.cloudinary.com/dtowrsbhe/image/upload/v1765765062/Asset_2.png', NULL, TRUE, DATE_SUB(NOW(), INTERVAL 20 DAY));
 
 INSERT INTO product_variants (product_id, sku_code, color, size, stock, created_at) VALUES
 (1, 'P1-WHIT-S-100001', 'White', 'S', 20, DATE_SUB(NOW(), INTERVAL 50 DAY)),

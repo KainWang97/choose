@@ -42,6 +42,9 @@ public class Product {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
+    @Column(name = "color_images", columnDefinition = "TEXT")
+    private String colorImages; // JSON格式：{"White": ["url1", "url2"], "Black": ["url1"]}
+
     @Column(name = "is_listed")
     private Boolean isListed = true;
 

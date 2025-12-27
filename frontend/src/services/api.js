@@ -29,6 +29,8 @@ function transformProduct(backend) {
     description: backend.description || "",
     price: Number(backend.price),
     imageUrl: backend.image || "", // DTO 使用 image
+    image: backend.image || "", // 保留原始欄位名稱供 ProductDetail 使用
+    colorImages: backend.colorImages || null, // 顏色對應圖片 Map
     isListed: backend.isListed ?? true,
     isFeatured: backend.isFeatured ?? false,
     createdAt: backend.createdAt,
@@ -346,6 +348,7 @@ export const productApi = {
       price: data.price,
       imageUrl: data.imageUrl,
       isListed: data.isListed ?? true,
+      colorImages: data.colorImages || null,
     };
     const backend = await apiPost("/products", requestBody);
     const product = transformProduct(backend);
@@ -378,6 +381,8 @@ export const productApi = {
       if (data.price !== undefined) requestBody.price = data.price;
       if (data.imageUrl !== undefined) requestBody.imageUrl = data.imageUrl;
       if (data.isListed !== undefined) requestBody.isListed = data.isListed;
+      if (data.colorImages !== undefined)
+        requestBody.colorImages = data.colorImages;
 
       const backend = await apiPut(`/products/${id}`, requestBody);
       const product = transformProduct(backend);

@@ -13,9 +13,80 @@ const addedAnimation = ref(false);
 const isImageLoaded = ref(false);
 const imageLoadError = ref(false);
 const imageLoadTimeout = ref(null);
+const currentImageIndex = ref(0); // 當前顯示的圖片索引
+
+// 圖片快取：追蹤已載入的圖片 URL
+const loadedImageCache = ref(new Set());
 
 // 選中的規格
 const selectedVariant = ref(null);
+
+// 取得所有商品圖片（主圖 + 所有顏色的補充圖片）
+const currentImages = computed(() => {
+  const mainImage = props.product.image; // API 回傳欄位名稱是 'image'
+  const colorImages = props.product.colorImages;
+  const allImages = [mainImage];
+
+  // 合併所有顏色的圖片
+  if (colorImages) {
+    Object.values(colorImages).forEach((urls) => {
+      if (Array.isArray(urls)) {
+        allImages.push(...urls);
+      }
+    });
+  }
+
+  // 去除重複的圖片 URL
+  return [...new Set(allImages)].filter(Boolean);
+});
+
+// 當前顯示的圖片 URL
+const currentImageUrl = computed(() => {
+  return currentImages.value[currentImageIndex.value] || props.product.imageUrl;
+});
+
+// 檢查圖片是否已快取
+const isImageCached = (url) => {
+  return loadedImageCache.value.has(getLargeImageUrl(url));
+};
+
+// 預載入所有商品圖片
+const preloadAllImages = () => {
+  // 收集所有可能的圖片 URL
+  const allUrls = new Set();
+  allUrls.add(props.product.image);
+
+  if (props.product.colorImages) {
+    Object.values(props.product.colorImages).forEach((urls) => {
+      urls.forEach((url) => allUrls.add(url));
+    });
+  }
+
+  // 背景預載入
+  allUrls.forEach((url) => {
+    if (url && !isImageCached(url)) {
+      const img = new Image();
+      img.onload = () => {
+        loadedImageCache.value.add(getLargeImageUrl(url));
+      };
+      img.src = getLargeImageUrl(url);
+    }
+  });
+};
+
+// 切換圖片（使用快取判斷是否需要 loading）
+const selectImage = (index) => {
+  currentImageIndex.value = index;
+  const targetUrl = currentImages.value[index];
+
+  // 如果圖片已快取，直接顯示
+  if (isImageCached(targetUrl)) {
+    isImageLoaded.value = true;
+  } else {
+    isImageLoaded.value = false;
+    startImageLoadTimeout();
+  }
+};
 
 // 取得所有可選的顏色
 const availableColors = computed(() => {
@@ -74,6 +145,8 @@ const handleImageLoad = () => {
   clearImageLoadTimeout();
   isImageLoaded.value = true;
   imageLoadError.value = false;
+  // 加入快取
+  loadedImageCache.value.add(getLargeImageUrl(currentImageUrl.value));
 };
 
 // 圖片載入失敗
@@ -81,7 +154,7 @@ const handleImageError = () => {
   clearImageLoadTimeout();
   isImageLoaded.value = true; // 允許顯示錯誤狀態
   imageLoadError.value = true;
-  console.error("圖片載入失敗:", props.product?.imageUrl);
+  console.error("圖片載入失敗:", currentImageUrl.value);
 };
 
 // 初始化選擇第一個規格
@@ -91,6 +164,8 @@ onMounted(() => {
     selectedVariant.value = props.product.variants[0];
   }
   startImageLoadTimeout();
+  // 預載入所有商品圖片
+  preloadAllImages();
 });
 
 // 清理計時器
@@ -104,20 +179,61 @@ watch(
   (newProduct) => {
     isImageLoaded.value = false; // 重置圖片載入狀態
     imageLoadError.value = false;
+    currentImageIndex.value = 0; // 重置圖片索引
     startImageLoadTimeout(); // 重新開始超時計時
     if (newProduct.variants?.length) {
       selectedVariant.value = newProduct.variants[0];
     } else {
       selectedVariant.value = null;
     }
+
+    // 檢查新商品的初始圖片是否已快取
+    const initialImageUrl = currentImages.value[0];
+    if (isImageCached(initialImageUrl)) {
+      isImageLoaded.value = true;
+    } else {
+      isImageLoaded.value = false;
+      startImageLoadTimeout(); // 重新開始超時計時
+    }
+    // 預載入新商品的所有圖片
+    preloadAllImages();
   }
 );
 
-// 選擇顏色
+// 監聽顏色變化（現在所有圖片都顯示，不需要重置圖片索引）
+// 保留此 watcher 以便未來可能的擴展
+watch(
+  () => selectedVariant.value?.color,
+  () => {
+    // 顏色切換不再需要重置圖片，因為所有圖片都已顯示在縮圖列表中
+  }
+);
+
+// 選擇顏色（並自動跳到該顏色的第一張圖片）
 const selectColor = (color) => {
   const variant = props.product.variants?.find((v) => v.color === color);
   if (variant) {
     selectedVariant.value = variant;
+
+    // 找到該顏色的第一張圖片在 currentImages 中的索引
+    const colorImages = props.product.colorImages;
+    if (colorImages && colorImages[color]?.length) {
+      const firstColorImage = colorImages[color][0];
+      const imageIndex = currentImages.value.findIndex(
+        (url) => url === firstColorImage
+      );
+      if (imageIndex !== -1) {
+        // 使用快取判斷是否顯示 loading
+        if (isImageCached(firstColorImage)) {
+          currentImageIndex.value = imageIndex;
+          isImageLoaded.value = true;
+        } else {
+          currentImageIndex.value = imageIndex;
+          isImageLoaded.value = false;
+          startImageLoadTimeout();
+        }
+      }
+    }
   }
 };
 
@@ -159,37 +275,64 @@ const handleAddToCart = () => {
     <div class="container mx-auto px-4 py-20">
       <div class="flex flex-col md:flex-row gap-8 items-start">
         <!-- Image Section -->
-        <div
-          class="w-full md:w-1/2 aspect-[3/4] md:aspect-auto md:h-auto relative overflow-hidden"
-          :class="isImageLoaded ? 'bg-stone-100' : 'bg-stone-200'"
-        >
-          <!-- Loading Spinner -->
+        <div class="w-full md:w-1/2 space-y-3">
+          <!-- 主圖區域 -->
           <div
-            v-if="!isImageLoaded"
-            class="absolute inset-0 flex items-center justify-center"
+            class="aspect-[3/4] relative overflow-hidden"
+            :class="isImageLoaded ? 'bg-stone-100' : 'bg-stone-200'"
           >
+            <!-- Loading Spinner -->
             <div
-              class="w-10 h-10 border-2 border-stone-400 border-t-stone-600 rounded-full animate-spin"
-            ></div>
+              v-if="!isImageLoaded"
+              class="absolute inset-0 flex items-center justify-center"
+            >
+              <div
+                class="w-10 h-10 border-2 border-stone-400 border-t-stone-600 rounded-full animate-spin"
+              ></div>
+            </div>
+
+            <img
+              :src="getLargeImageUrl(currentImageUrl)"
+              :alt="product.name"
+              @load="handleImageLoad"
+              @error="handleImageError"
+              class="w-full h-full object-cover transition-opacity duration-500"
+              :class="isImageLoaded ? 'opacity-100' : 'opacity-0'"
+            />
+            <div
+              v-if="isSoldOut && isSingleVariant"
+              class="absolute inset-0 bg-stone-900/10 flex items-center justify-center"
+            >
+              <span
+                class="bg-sumi text-washi px-6 py-2 text-sm uppercase tracking-widest border border-washi transform -rotate-12"
+              >
+                Sold Out
+              </span>
+            </div>
           </div>
 
-          <img
-            :src="getLargeImageUrl(product.imageUrl)"
-            :alt="product.name"
-            @load="handleImageLoad"
-            @error="handleImageError"
-            class="w-full h-full object-cover transition-opacity duration-500"
-            :class="isImageLoaded ? 'opacity-100' : 'opacity-0'"
-          />
+          <!-- 縮圖列表 -->
           <div
-            v-if="isSoldOut && isSingleVariant"
-            class="absolute inset-0 bg-stone-900/10 flex items-center justify-center"
+            v-if="currentImages.length > 1"
+            class="flex gap-2 overflow-x-auto pb-2"
           >
-            <span
-              class="bg-sumi text-washi px-6 py-2 text-sm uppercase tracking-widest border border-washi transform -rotate-12"
+            <button
+              v-for="(img, index) in currentImages"
+              :key="index"
+              @click="selectImage(index)"
+              class="flex-shrink-0 w-16 h-20 border-2 transition-all overflow-hidden"
+              :class="
+                currentImageIndex === index
+                  ? 'border-sumi'
+                  : 'border-stone-200 hover:border-stone-400'
+              "
             >
-              Sold Out
-            </span>
+              <img
+                :src="getLargeImageUrl(img)"
+                :alt="`${product.name} - ${index + 1}`"
+                class="w-full h-full object-cover"
+              />
+            </button>
           </div>
         </div>
 

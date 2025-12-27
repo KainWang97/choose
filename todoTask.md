@@ -15,17 +15,17 @@
 
 ---
 
-### 2. 🟡 商品詳情頁多圖片介紹
+### 2. ✅ 商品詳情頁多圖片介紹
 
-**困難度**：中 | **預估時間**：4-6 小時
+**困難度**：中 | **狀態**：已完成
 
-- [ ] 後端：擴充 Product Model 支援多圖片
-- [ ] 後端：新增/修改 ProductDTO
-- [ ] 前端：商品詳情頁圖片輪播
-- [ ] 前端：縮圖列表切換
-- [ ] Admin：多圖片上傳 UI
+- [x] 後端：擴充 Product Model 支援多圖片
+- [x] 後端：新增/修改 ProductDTO
+- [x] 前端：商品詳情頁圖片輪播
+- [x] 前端：縮圖列表切換
+- [ ] Admin：多圖片上傳 UI (延後)
 
-**相關檔案**：`Product.java`, `ProductDTO.java`, `ProductDetail.vue`, `AdminDashboard.vue`
+**相關檔案**：`Product.java`, `ProductDTO.java`, `ProductDetail.vue`, `api.js`
 
 ---
 
