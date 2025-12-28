@@ -338,8 +338,9 @@ const handleAddToCart = () => {
 
         <!-- Content Section -->
         <div class="w-full md:w-1/2 py-4 flex flex-col justify-center bg-washi">
-          <div class="max-w-md mx-auto w-full space-y-8 animate-slide-up">
-            <div class="space-y-2 border-l-2 border-stone-800 pl-6">
+          <div class="max-w-md mx-auto w-full flex flex-col animate-slide-up">
+            <!-- 標題/價格 (order-1) -->
+            <div class="space-y-2 border-l-2 border-stone-800 pl-6 order-1">
               <p class="text-xs tracking-[0.2em] uppercase text-stone-500">
                 {{ product.category }}
               </p>
@@ -351,16 +352,10 @@ const handleAddToCart = () => {
               </p>
             </div>
 
-            <div
-              class="py-8 space-y-6 text-stone-600 font-light leading-relaxed"
-            >
-              <p>{{ product.description }}</p>
-            </div>
-
-            <!-- Variant Selection -->
+            <!-- Variant Selection (行動版 order-2，桌面版 order-3) -->
             <div
               v-if="product.variants?.length"
-              class="space-y-4 border-t border-stone-200 pt-6"
+              class="space-y-4 border-t border-stone-200 pt-6 mt-6 order-2 md:order-3"
             >
               <!-- 單一規格顯示 -->
               <div v-if="isSingleVariant && selectedVariant" class="space-y-2">
@@ -435,8 +430,15 @@ const handleAddToCart = () => {
               </template>
             </div>
 
-            <!-- Add to Cart -->
-            <div class="space-y-2">
+            <!-- 描述 (行動版 order-3，桌面版 order-2) -->
+            <div
+              class="py-6 md:py-8 space-y-6 text-stone-600 font-light leading-relaxed order-3 md:order-2"
+            >
+              <p>{{ product.description }}</p>
+            </div>
+
+            <!-- Add to Cart (order-4) -->
+            <div class="space-y-2 order-4">
               <button
                 @click="handleAddToCart"
                 :disabled="!canAdd || addedAnimation"

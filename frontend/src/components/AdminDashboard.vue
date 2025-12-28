@@ -1216,19 +1216,19 @@ const monthlySales = computed(() => {
                         @click="openVariantManager(product)"
                         class="px-3 py-1 text-xs border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors"
                       >
-                        規格
+                        庫存管理
                       </button>
                       <button
                         @click="openEditForm(product)"
                         class="px-3 py-1 text-xs border border-stone-300 hover:bg-stone-100 transition-colors"
                       >
-                        Edit
+                        編輯
                       </button>
                       <button
                         @click="confirmDelete(product)"
                         class="px-3 py-1 text-xs border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
                       >
-                        Delete
+                        刪除
                       </button>
                     </div>
                   </td>
@@ -1279,13 +1279,13 @@ const monthlySales = computed(() => {
                         @click="openEditCategoryForm(category)"
                         class="px-3 py-1 text-xs border border-stone-300 hover:bg-stone-100 transition-colors"
                       >
-                        Edit
+                        編輯
                       </button>
                       <button
                         @click="confirmDeleteCategory(category)"
                         class="px-3 py-1 text-xs border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
                       >
-                        Delete
+                        刪除
                       </button>
                     </div>
                   </td>
@@ -1766,57 +1766,61 @@ const monthlySales = computed(() => {
             >
               <!-- 標題列（可點擊展開/收合） -->
               <div
-                class="p-4 cursor-pointer hover:bg-white/30 transition-colors flex justify-between items-center"
+                class="p-3 sm:p-4 cursor-pointer hover:bg-white/30 transition-colors"
                 @click="toggleInquiryExpand(inquiry.id)"
               >
-                <div class="flex items-center gap-3 flex-1 min-w-0">
-                  <!-- 展開/收合圖示 -->
-                  <span class="text-stone-400 text-sm shrink-0">
-                    {{ isInquiryExpanded(inquiry.id) ? "▼" : "▶" }}
-                  </span>
-                  <!-- 狀態標籤（放大） -->
-                  <span
-                    class="px-3 py-1.5 text-sm font-medium rounded shrink-0"
-                    :class="
-                      inquiry.status === 'PENDING'
-                        ? 'bg-amber-500 text-white'
-                        : inquiry.status === 'REPLIED_TRACKING'
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-green-600 text-white'
-                    "
-                  >
-                    {{
-                      inquiry.status === "PENDING"
-                        ? "待處理"
-                        : inquiry.status === "REPLIED_TRACKING"
-                        ? "追蹤中"
-                        : "已結案"
-                    }}
-                  </span>
-                  <!-- 案件編號 -->
-                  <span
-                    v-if="inquiry.caseNumber"
-                    class="text-xs font-mono text-stone-500 bg-white/50 px-2 py-1 rounded shrink-0"
-                  >
-                    {{ inquiry.caseNumber }}
-                  </span>
-                  <!-- 姓名與主題 -->
-                  <div class="min-w-0 flex-1">
-                    <span class="font-medium text-sumi">{{
-                      inquiry.name
-                    }}</span>
+                <!-- 第一行：狀態 + 案件編號 + 日期 -->
+                <div
+                  class="flex items-center justify-between gap-2 mb-2 sm:mb-0"
+                >
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <!-- 展開/收合圖示 -->
+                    <span class="text-stone-400 text-sm shrink-0">
+                      {{ isInquiryExpanded(inquiry.id) ? "▼" : "▶" }}
+                    </span>
+                    <!-- 狀態標籤 -->
                     <span
-                      v-if="inquiry.subject"
-                      class="text-stone-500 ml-2 text-sm truncate"
+                      class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded shrink-0"
+                      :class="
+                        inquiry.status === 'PENDING'
+                          ? 'bg-amber-500 text-white'
+                          : inquiry.status === 'REPLIED_TRACKING'
+                          ? 'bg-orange-500 text-white'
+                          : 'bg-green-600 text-white'
+                      "
                     >
-                      - {{ inquiry.subject }}
+                      {{
+                        inquiry.status === "PENDING"
+                          ? "待處理"
+                          : inquiry.status === "REPLIED_TRACKING"
+                          ? "追蹤中"
+                          : "已結案"
+                      }}
+                    </span>
+                    <!-- 案件編號 -->
+                    <span
+                      v-if="inquiry.caseNumber"
+                      class="text-xs font-mono text-stone-500 bg-white/50 px-2 py-1 rounded"
+                    >
+                      {{ inquiry.caseNumber }}
                     </span>
                   </div>
-                </div>
-                <div class="text-right shrink-0 ml-4">
-                  <p class="text-xs text-stone-500">
+                  <!-- 日期 -->
+                  <p class="text-xs text-stone-500 shrink-0">
                     {{ formatDateTime(inquiry.createdAt) }}
                   </p>
+                </div>
+                <!-- 第二行：姓名與主題 -->
+                <div class="sm:flex sm:items-center sm:gap-2 mt-1 sm:mt-2">
+                  <span class="font-medium text-sumi text-sm sm:text-base">
+                    {{ inquiry.name }}
+                  </span>
+                  <span
+                    v-if="inquiry.subject"
+                    class="text-stone-500 text-xs sm:text-sm block sm:inline mt-0.5 sm:mt-0"
+                  >
+                    - {{ inquiry.subject }}
+                  </span>
                 </div>
               </div>
 
@@ -2305,13 +2309,13 @@ const monthlySales = computed(() => {
                       @click="editVariant(variant)"
                       class="px-2 py-1 text-xs border border-stone-300 hover:bg-stone-100"
                     >
-                      Edit
+                      編輯
                     </button>
                     <button
                       @click.stop="confirmDeleteVariant(variant)"
                       class="px-2 py-1 text-xs border border-red-300 text-red-600 hover:bg-red-50"
                     >
-                      Delete
+                      刪除
                     </button>
                   </div>
                 </td>
@@ -2448,12 +2452,14 @@ const monthlySales = computed(() => {
     <!-- Reply Inquiry Modal -->
     <div
       v-if="isReplyModalOpen && currentInquiry"
-      class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4"
       @click.self="closeReplyModal"
     >
-      <div class="bg-white max-w-2xl w-full p-8 shadow-xl">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="font-serif text-2xl text-sumi">回覆客服訊息</h2>
+      <div
+        class="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto p-4 sm:p-8 shadow-xl"
+      >
+        <div class="flex justify-between items-center mb-4 sm:mb-6">
+          <h2 class="font-serif text-xl sm:text-2xl text-sumi">回覆客服訊息</h2>
           <button
             @click="closeReplyModal"
             class="text-stone-400 hover:text-sumi text-2xl"
@@ -2463,11 +2469,19 @@ const monthlySales = computed(() => {
         </div>
 
         <!-- 原始訊息 -->
-        <div class="mb-6 p-4 bg-stone-50 border border-stone-200 rounded">
-          <div class="flex justify-between items-start mb-2">
+        <div
+          class="mb-4 sm:mb-6 p-3 sm:p-4 bg-stone-50 border border-stone-200 rounded"
+        >
+          <div
+            class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-0 mb-2"
+          >
             <div>
-              <p class="font-medium text-sumi">{{ currentInquiry.name }}</p>
-              <p class="text-xs text-stone-500">{{ currentInquiry.email }}</p>
+              <p class="font-medium text-sumi text-sm sm:text-base">
+                {{ currentInquiry.name }}
+              </p>
+              <p class="text-xs text-stone-500 break-all">
+                {{ currentInquiry.email }}
+              </p>
             </div>
             <p class="text-xs text-stone-400">
               {{ formatDateTime(currentInquiry.createdAt) }}
@@ -2482,30 +2496,32 @@ const monthlySales = computed(() => {
         </div>
 
         <!-- 回覆輸入 -->
-        <form @submit.prevent="submitReply" class="space-y-4">
+        <form @submit.prevent="submitReply" class="space-y-3 sm:space-y-4">
           <div>
             <label class="block text-sm text-stone-500 mb-2">回覆內容 *</label>
             <textarea
               v-model="replyContent"
               required
-              rows="6"
+              rows="5"
               class="w-full border border-stone-300 p-3 text-sm focus:outline-none focus:border-sumi resize-none"
               placeholder="輸入您的回覆內容..."
             ></textarea>
           </div>
           <p class="text-xs text-stone-400">送出後將自動發送 Email 通知用戶</p>
-          <div class="flex justify-end gap-3 pt-4 border-t border-stone-100">
+          <div
+            class="flex justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-stone-100"
+          >
             <button
               type="button"
               @click="closeReplyModal"
-              class="px-6 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50"
+              class="px-4 sm:px-6 py-2 border border-stone-300 text-stone-600 text-xs uppercase tracking-widest hover:bg-stone-50"
             >
               取消
             </button>
             <button
               type="submit"
               :disabled="!replyContent.trim()"
-              class="px-6 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 sm:px-6 py-2 bg-sumi text-washi text-xs uppercase tracking-widest hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               送出回覆
             </button>
@@ -2513,7 +2529,7 @@ const monthlySales = computed(() => {
         </form>
 
         <!-- 模板選擇區 -->
-        <div class="mt-6 pt-6 border-t border-stone-200">
+        <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-stone-200">
           <div class="flex items-center justify-between mb-3">
             <label class="text-sm text-stone-500">使用回覆模板</label>
             <button
@@ -2527,7 +2543,7 @@ const monthlySales = computed(() => {
           <div class="flex gap-2">
             <select
               v-model="selectedTemplateId"
-              class="flex-1 border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi"
+              class="flex-1 min-w-0 border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi"
             >
               <option value="">-- 選擇模板 --</option>
               <option v-for="t in replyTemplates" :key="t.id" :value="t.id">
@@ -2538,7 +2554,7 @@ const monthlySales = computed(() => {
               type="button"
               @click="applyTemplate"
               :disabled="!selectedTemplateId"
-              class="px-4 py-2 bg-stone-600 text-white text-xs uppercase hover:bg-stone-700 disabled:opacity-50"
+              class="px-3 sm:px-4 py-2 bg-stone-600 text-white text-xs uppercase hover:bg-stone-700 disabled:opacity-50 shrink-0"
             >
               套用
             </button>
