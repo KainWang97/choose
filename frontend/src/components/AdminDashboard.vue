@@ -2071,9 +2071,9 @@ const monthlySales = computed(() => {
                 v-model.number="formData.price"
                 type="number"
                 min="0"
-                step="0.01"
                 required
-                class="w-full border border-stone-300 p-3 focus:outline-none focus:border-sumi"
+                @blur="formData.price = Math.max(0, formData.price || 0)"
+                class="w-full border border-stone-300 p-3 focus:outline-none focus:border-sumi [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
           </div>
@@ -2128,7 +2128,7 @@ const monthlySales = computed(() => {
           <div class="space-y-4 border-t pt-4">
             <label
               class="block text-xs uppercase tracking-widest text-stone-500"
-              >顏色圖片（選填）</label
+              >顏色圖片</label
             >
 
             <!-- 現有圖片顯示 -->
@@ -2403,7 +2403,13 @@ const monthlySales = computed(() => {
                 type="number"
                 min="0"
                 required
-                class="w-20 border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi"
+                @blur="
+                  variantFormData.stock = Math.max(
+                    0,
+                    variantFormData.stock || 0
+                  )
+                "
+                class="w-20 border border-stone-300 p-2 text-sm focus:outline-none focus:border-sumi [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
             <button
